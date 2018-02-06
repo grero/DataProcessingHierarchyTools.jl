@@ -21,6 +21,10 @@ using Base.Test
             @test isfile("$(d2)/test.txt")
         end
         #cleanup
+        cd(dirs[1]) do
+            thislevel = DPHT.level()
+            @test thislevel == "session"
+        end
         for d2 in dirs
             rm(d2;recursive=true)
         end
