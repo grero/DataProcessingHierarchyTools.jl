@@ -1,4 +1,7 @@
 # DataProcessingHierarchyTools
+[![Build Status](https://travis-ci.org/grero/DataProcessingHierarchyTools.jl.svg?branch=master)](https://travis-ci.org/grero/DataProcessingHierarchyTools.jl)
+[![codecov](https://codecov.io/gh/grero/DataProcessingHierarchyTools.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/grero/DataProcessingHierarchyTools.jl)
+
 Tools to facilitate processing and visualization of data organized in a hierarchy
 
 ## Example 1
