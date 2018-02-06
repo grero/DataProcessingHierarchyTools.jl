@@ -1,4 +1,6 @@
 module DataProcessingHierarchyTools
+using ProgressMeter
+using Glob
 
 include("types.jl")
 
