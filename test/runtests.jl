@@ -1,5 +1,7 @@
 using DataProcessingHierarchyTools
 using Base.Test
 
-# write your own tests here
-@test 1 == 2
+@testset "Level functions" begin
+    _name = ExperimentDataTools.get_level_name("days","newWorkingMemory/Pancake/20130923/")
+    @test _name == "20130923"
+end
