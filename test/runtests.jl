@@ -102,4 +102,13 @@ end
     end
 end
 
+@testset "Graceful fail" begin
+    dd = tempdir()
+    mkpath(dirs[1])
+    cd(dirs[1]) do
+        @test_throws ArgumentError DPHT.process_level("rubbish")
+    end
+    rm(dirs[1];recursive=true)
+end
+
 end#module
