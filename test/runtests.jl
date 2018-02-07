@@ -2,7 +2,6 @@ module DPHTTest
 using DataProcessingHierarchyTools
 const DPHT = DataProcessingHierarchyTools
 using Base.Test
-using MAT
 
 import Base.hcat
 
@@ -12,7 +11,7 @@ struct TestData <: DPHData
 end
 
 level(::Type{TestData}) = "session"
-filename(::Type{TestData}) = "data.mat"
+filename(::Type{TestData}) = "data.txt"
 
 function Base.hcat(X1::TestData, X2::TestData)
     ndata = "$(X1.data)$(X2.data)"
@@ -22,8 +21,12 @@ end
 
 
 function TestData()
-    dd = MAT.matread(filename(TestData))
-    TestData(dd["data"], dd["setid"])
+    open(filename(TestData), "r") do f
+        data = readline(f)
+        ss = readline(f)
+        setid = [parse(Int64,s) for s in split(ss, ',')]
+        TestData(dd["data"], dd["setid"])
+    end
 end
 
 function TestData(x)
@@ -33,8 +36,13 @@ function TestData(x)
 end
 
 function save_data(X::TestData)
-    MAT.matwrite(filename(TestData), Dict("data" => X.data,
-                                          "setid" => X.setid))
+    open(filename(TestData),"w") do f
+        write(f, "$(X.data)\n")
+        for ss in X.setid[1:end-1]
+            write(f, "$(ss),")
+        end
+        write(f, "$(X.setid[end])\n")
+    end
 end
 
 dirs =["20140903/session01", "20140903/session02"]
