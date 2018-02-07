@@ -4,12 +4,14 @@ const DPHT = DataProcessingHierarchyTools
 import DataProcessingHierarchyTools:level, filename
 using Base.Test
 
-import Base.hcat
+import Base:hcat, zero
 
 struct TestData <: DPHData
     data::String
     setid::Vector{Int64}
 end
+
+zero(::Type{TestData}) = TestData("", Int64[])
 
 DPHT.level(::Type{TestData}) = "session"
 DPHT.filename(::Type{TestData}) = "data.txt"
@@ -26,7 +28,7 @@ function TestData()
         data = readline(f)
         ss = readline(f)
         setid = [parse(Int64,s) for s in split(ss, ',')]
-        TestData(dd["data"], dd["setid"])
+        TestData(data, setid)
     end
 end
 
@@ -96,6 +98,23 @@ end
         end
         @test Y.data == "testtest"
         @test Y.setid == [1,2]
+        cd(dirs[1]) do
+            mkdir("array01")
+            cd("array01") do
+                q = DPHT.load(TestData)
+                @test q.data == "test"
+                @test  q.setid == [1]
+            end
+        end
+        cd(dirs[2]) do
+            rm(filename(TestData))
+            mkdir("array01")
+            cd("array01") do
+                q = DPHT.load(TestData)
+                @test q.data == ""
+                @test  q.setid == []
+            end
+        end
         for d2 in dirs
             rm(d2;recursive=true)
         end
