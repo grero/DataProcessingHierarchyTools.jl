@@ -109,6 +109,8 @@ end
         @test_throws ArgumentError DPHT.process_level("rubbish")
     end
     rm(dirs[1];recursive=true)
+    @test_throws ErrorException DPHT.level(DPHT.DPHData)
+    @test_throws ErrorException DPHT.filename(DPHT.DPHData)
 end
 
 end#module
