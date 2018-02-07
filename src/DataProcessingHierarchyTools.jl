@@ -45,6 +45,9 @@ function get_level_name(target_level::String, dir=pwd())
     pp
 end
 
+"""
+Get all directories corresponding to `target_level` under the current hierarchy
+"""
 function get_level_dirs(target_level::String, dir=pwd())
     rel_path = process_level(target_level, dir)
     target_idx = findfirst(l->target_level==l, levels)
@@ -107,10 +110,15 @@ end
 """
 Load an object of type `T` from the current directory, using additional constructor arguments `args`.
 """
-function load(::Type{T}, args...) where T <: DPHData
+function load(::Type{T}, args...;kvs...) where T <: DPHData
     dir = process_level(T)
     qq = cd(dir) do
-        T(args...)
+        if isfile(filename)
+            qq = T()
+        else
+            qq = zero(T)
+        end
+        qq
     end
     qq
 end
