@@ -113,7 +113,7 @@ Load an object of type `T` from the current directory, using additional construc
 function load(::Type{T}, args...;kvs...) where T <: DPHData
     dir = process_level(T)
     qq = cd(dir) do
-        if isfile(filename)
+        if isfile(filename(T))
             qq = T()
         else
             qq = zero(T)
