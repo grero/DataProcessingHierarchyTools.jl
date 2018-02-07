@@ -8,6 +8,8 @@ include("types.jl")
 export DPHData
 
 const levels = ["days", "day", "session", "array", "channel", "cell"]
+const level_patterns = [r"[0-9A-Za-z]*", r"[0-9]{8}", r"session[0-9]{2}", r"array[0-9]{2}", r"channel[0-9]{3}", r"cell[0-9]{2}"]
+const level_patterns_s = ["*", "[0-9]*", "session[0-9]*", "array[0-9]*", "channel[0-9]*", "cell[0-9]*"]
 
 level() = level(pwd())
 
@@ -40,6 +42,12 @@ function get_level_name(target_level::String, dir=pwd())
         i -= 1
     end
     pp
+end
+
+function get_level_dirs(target_level::String, dir=pwd())
+    rel_path = process_level(target_level, dir)
+    target_idx = findfirst(l->target_level==l, levels)
+    dirs = glob(joinpath(rel_path, "..", level_patterns_s[target_idx]))
 end
 
 """

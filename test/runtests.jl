@@ -68,6 +68,10 @@ dirs =["20140903/session01", "20140903/session02"]
         cd(dirs[1]) do
             thislevel = DPHT.level()
             @test thislevel == "session"
+            #test getting all level directories belonging to a particular level
+            session_dirs = DPHT.get_level_dirs("session")
+            @test session_dirs[1] == "./../session01"
+            @test session_dirs[2] == "./../session02"
         end
         for d2 in dirs
             rm(d2;recursive=true)
