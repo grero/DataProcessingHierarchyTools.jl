@@ -1,6 +1,7 @@
 module DPHTTest
 using DataProcessingHierarchyTools
 const DPHT = DataProcessingHierarchyTools
+import DataProcessingHierarchyTools:level, filename
 using Base.Test
 
 import Base.hcat
@@ -10,8 +11,8 @@ struct TestData <: DPHData
     setid::Vector{Int64}
 end
 
-level(::Type{TestData}) = "session"
-filename(::Type{TestData}) = "data.txt"
+DPHT.level(::Type{TestData}) = "session"
+DPHT.filename(::Type{TestData}) = "data.txt"
 
 function Base.hcat(X1::TestData, X2::TestData)
     ndata = "$(X1.data)$(X2.data)"
@@ -89,6 +90,8 @@ end
         for d2 in dirs
             cd(d2) do
                 @test isfile(filename(TestData))
+                ll = DPHT.process_level(TestData)
+                @test ll == "."
             end
         end
         @test Y.data == "testtest"
