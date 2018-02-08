@@ -76,6 +76,9 @@ dirs =["20140903/session01", "20140903/session02"]
             @test session_dirs[1] == "./../session01"
             @test session_dirs[2] == "./../session02"
         end
+        dirsn = DPHT.get_level_dirs("session")
+        @test dirsn[1] == dirs[1]
+        @test dirsn[2] == dirs[2]
         for d2 in dirs
             rm(d2;recursive=true)
         end
@@ -115,6 +118,7 @@ end
                 @test  q.setid == []
             end
         end
+
         for d2 in dirs
             rm(d2;recursive=true)
         end
