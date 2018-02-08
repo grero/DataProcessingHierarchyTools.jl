@@ -23,7 +23,10 @@ function level(cwd::String)
     ss = rstrip(dd, numbers)
     if isempty(ss)
         # only numbers; assume this is a date
-        return "day"
+        ss = "day"
+    elseif dd == ss
+        #no numbers, this is the subject name
+        ss = "days"
     end
     return ss
 end
