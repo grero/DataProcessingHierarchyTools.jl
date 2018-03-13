@@ -110,11 +110,13 @@ end
 Process each directory in `dirs` by running the function `func`.
 """
 function process_dirs(func::Function, dirs::Vector{String}, args...;kvs...)
-    @showprogress 1 "Processing dirs..." for d in dirs
-        cd(d) do
+    Q = Vector{Any}(length(dirs))
+    @showprogress 1 "Processing dirs..." for (i,d) in enumerate(dirs)
+        Q[i] = cd(d) do
             func(args...;kvs...)
         end
     end
+    Q
 end
 
 """
