@@ -110,11 +110,17 @@ end
 Visit each directory in `dirs`, instantiating type `T` with argumments `args` and keyword arguments `kvs`. Note that this function is similar to `process_dirs`, except unlike that function, `visit_dirs` does not return any results.
 """
 function visit_dirs(::Type{T}, dirs::Vector{String}, args...;kvs...) where T <: DPHData
+    skipped_dirs = String[]
     @showprogress 1 "Processing dirs..." for d in dirs
         cd(d) do
-            T(args...;kvs...)
+            try
+                T(args...;kvs...)
+            catch
+                push!(skipped_dirs, d)
+            end
         end
     end
+    skipped_dirs
 end
 
 """
