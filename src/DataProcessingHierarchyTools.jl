@@ -26,7 +26,7 @@ function level(cwd::String)
         ss = "day"
     elseif dd == ss
         #no numbers, this is the subject name
-        ss = "days"
+        ss = "subject"
     end
     return ss
 end
