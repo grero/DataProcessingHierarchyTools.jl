@@ -9,6 +9,28 @@ const levels = ["subjects", "subject", "day", "session", "array", "channel", "ce
 const level_patterns = [r"[0-9A-Za-z]*", r"[0-9]{8}", r"session[0-9]{2}", r"array[0-9]{2}", r"channel[0-9]{3}", r"cell[0-9]{2}"]
 const level_patterns_s = ["*", "*", "[0-9]*", "session[0-9]*", "array[0-9]*", "channel[0-9]*", "cell[0-9]*"]
 
+function get_numbers(ss::String)
+    filter(isdigit,ss)
+end
+
+shortnames = Dict("subjects" => x->"",
+                  "subject" => x->x[1:1],
+                  "day" => x->x,
+                  "session" => x->"s$(get_numbers(x))",
+                  "array" => x->"a$(get_numbers(x))",
+                  "channel" => x->"g$(get_numbers(x))",
+                  "cell" => x->"c$(get_numbers(x))")
+
+function get_shortname(ss::String)
+    _r = ss
+    qs = String[]
+    while !isempty(_r)
+        _r, _p = splitdir(_r)
+        push!(qs, shortnames[level(_p)](_p))
+    end
+    join(reverse(qs),"")
+end
+
 level() = level(pwd())
 level(::Type{DPHData}) = error("Not implemented")
 filename(::Type{DPHData}) = error("Not implemented")

@@ -138,4 +138,11 @@ end
     @test_throws ErrorException DPHT.filename(DPHT.DPHData)
 end
 
+@testset "Shortnames" begin
+    sn = DPHT.get_shortname("cell01")
+    @test sn == "c01"
+    sn = DPHT.get_shortname("James/20140904/session01/array01/channel030/cell01")
+    @test sn == "J20140904s01a01g030c01"
+end
+
 end#module
