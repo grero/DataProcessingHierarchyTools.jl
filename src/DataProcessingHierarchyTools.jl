@@ -5,9 +5,9 @@ using Glob
 
 include("types.jl")
 
-const levels = ["days", "day", "session", "array", "channel", "cell"]
+const levels = ["subjects", "subject", "day", "session", "array", "channel", "cell"]
 const level_patterns = [r"[0-9A-Za-z]*", r"[0-9]{8}", r"session[0-9]{2}", r"array[0-9]{2}", r"channel[0-9]{3}", r"cell[0-9]{2}"]
-const level_patterns_s = ["*", "[0-9]*", "session[0-9]*", "array[0-9]*", "channel[0-9]*", "cell[0-9]*"]
+const level_patterns_s = ["*", "*", "[0-9]*", "session[0-9]*", "array[0-9]*", "channel[0-9]*", "cell[0-9]*"]
 
 level() = level(pwd())
 level(::Type{DPHData}) = error("Not implemented")
