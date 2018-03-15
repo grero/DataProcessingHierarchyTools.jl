@@ -22,11 +22,14 @@ shortnames = Dict("subjects" => x->"",
                   "cell" => x->"c$(get_numbers(x))")
 
 function get_shortname(ss::String)
-    _r = ss
+    this_level = level(ss)
+    this_idx = findfirst(l->this_level==l, levels)
+    _r, _p = splitdir(ss)
     qs = String[]
-    while !isempty(_r)
-        _r, _p = splitdir(_r)
+    while !isempty(_p) && this_idx > 1  # Stop once we have reached the bottom level
         push!(qs, shortnames[level(_p)](_p))
+        _r, _p = splitdir(_r)
+        this_idx -= 1 # Keep track of where we are in the hierarchy
     end
     join(reverse(qs),"")
 end
