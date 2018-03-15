@@ -123,6 +123,20 @@ function visit_dirs(::Type{T}, dirs::Vector{String}, args...;kvs...) where T <: 
     skipped_dirs
 end
 
+function visit_dirs(func::Function, dirs::Vector{String}, args...;kvs...)
+    skipped_dirs = String[]
+    @showprogress 1 "Processing dirs..." for d in dirs
+        cd(d) do
+         #   try
+                func(args...;kvs...)
+         #   catch
+         #       push!(skipped_dirs, d)
+         #   end
+        end
+    end
+    skipped_dirs
+end
+
 """
 Process each directory in `dirs` by running the function `func`.
 """
