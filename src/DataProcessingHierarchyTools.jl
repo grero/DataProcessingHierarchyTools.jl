@@ -37,8 +37,13 @@ end
 level() = level(pwd())
 level(::Type{DPHData}) = error("Not implemented")
 filename(::Type{DPHData}) = error("Not implemented")
+matname(::Type{DPHData}) = error("Not implemented")
 
-export DPHData, level, filename
+function plot_data(::Type{T},fig) where T <: DPHData
+    error("Not implemented")
+end
+
+export DPHData, level, filename, plot_data
 """
 Get the level of the directory represented by `cwd`.
 """
