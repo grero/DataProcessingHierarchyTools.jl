@@ -145,4 +145,19 @@ end
     @test sn == "J20140904s01a01g030c01"
 end
 
+struct MyArgs <: DPHT.DPHDataArgs
+    f1::Float64
+    f2::Int64
+    f3::AbstractVector{Float64}
+end
+
+@testset "ArgsCheck" begin
+    args = MyArgs(1.0, 3, -1.0:0.5:10.0)
+    @test DPHT.check_args(args, 1.0, 3, -1.0:0.5:10.0)
+    @test DPHT.check_args(args, 2.0, 3, -1.0:0.5:10.0) == false
+    @test DPHT.check_args(args, 1.0, 2, -1.0:0.5:10.0) == false
+    @test DPHT.check_args(args, 1.0, 3, -1.0:1.0:10.0) == false
+end
+
+
 end#module

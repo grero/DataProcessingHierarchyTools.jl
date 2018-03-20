@@ -9,6 +9,17 @@ const levels = ["subjects", "subject", "day", "session", "array", "channel", "ce
 const level_patterns = [r"[0-9A-Za-z]*", r"[0-9]{8}", r"session[0-9]{2}", r"array[0-9]{2}", r"channel[0-9]{3}", r"cell[0-9]{2}"]
 const level_patterns_s = ["*", "*", "[0-9]*", "session[0-9]*", "array[0-9]*", "channel[0-9]*", "cell[0-9]*"]
 
+function check_args(X::DPHDataArgs, args...)
+    matches = true
+    for (a0,a1) in zip(fieldnames(X), args)
+        if getfield(X, a0) != a1
+            matches = false
+            break
+        end
+    end
+    matches
+end
+
 function get_numbers(ss::String)
     filter(isdigit,ss)
 end
