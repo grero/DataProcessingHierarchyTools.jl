@@ -66,6 +66,8 @@ level() = level(pwd())
 level(::Type{DPHData}) = error("Not implemented")
 filename(::Type{DPHData}) = error("Not implemented")
 matname(::Type{DPHData}) = error("Not implemented")
+save(X::DPHData) = error("Not implemented")
+load(::Type{DPHData}) = error("Not implemented")
 
 function plot_data(::Type{T},fig) where T <: DPHData
     error("Not implemented")
