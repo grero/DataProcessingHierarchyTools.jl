@@ -2,6 +2,7 @@ __precompile__()
 module DataProcessingHierarchyTools
 using ProgressMeter
 using Glob
+import Base.hash
 
 include("types.jl")
 
@@ -94,6 +95,16 @@ end
 level() = level(pwd())
 level(::Type{DPHData}) = error("Not implemented")
 filename(::Type{DPHData}) = error("Not implemented")
+datatype(::Type{DPHDataArgs}) = error("Not implemented")
+
+function filename(args::T) where T <: DPHDataArgs
+    fname = filename(datatype(T))
+    h = hex(hash(args))
+    bn, ext = splitext(fname)
+    fname = join([bn, "_", h, ext])
+    fname
+end
+
 matname(::Type{DPHData}) = error("Not implemented")
 save(X::DPHData) = error("Not implemented")
 load(::Type{DPHData}) = error("Not implemented")
@@ -102,7 +113,8 @@ function plot_data(::Type{T},fig) where T <: DPHData
     error("Not implemented")
 end
 
-export DPHData, level, filename, plot_data
+export DPHData, level, filename, plot_data, datatype
+
 """
 Get the level of the directory represented by `cwd`.
 """

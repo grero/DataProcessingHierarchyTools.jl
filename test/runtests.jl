@@ -151,6 +151,19 @@ struct MyArgs <: DPHT.DPHDataArgs
     f3::AbstractVector{Float64}
 end
 
+struct MyData <: DPHT.DPHData
+    args::MyArgs
+end
+DPHT.filename(::Type{MyData}) = "mydata.mat"
+DPHT.datatype(::Type{MyArgs}) = MyData
+
+@testset "ArgsHash" begin
+    args = MyArgs(1.0, 3, -1.0:0.5:10.0)
+    h = hash(args)
+    @test h == 0x34c727e2f750c253
+    @test DPHT.filename(args) == "mydata_34c727e2f750c253.mat"
+end
+
 @testset "ArgsCheck" begin
     args = MyArgs(1.0, 3, -1.0:0.5:10.0)
     @test DPHT.check_args(args, 1.0, 3, -1.0:0.5:10.0)
