@@ -158,6 +158,12 @@ end
     @test DPHT.check_args(args, 2.0, 3, -1.0:0.5:10.0) == false
     @test DPHT.check_args(args, 1.0, 2, -1.0:0.5:10.0) == false
     @test DPHT.check_args(args, 1.0, 3, -1.0:1.0:10.0) == false
+    args2 = MyArgs(1.0, 3, -1.0:0.5:10.0)
+    @test DPHT.check_args(args, args2)
+    args3 = MyArgs(1.0, 3, -1.0:0.1:10.0)
+    @test DPHT.check_args(args, args3) == false
+    args4 = MyArgs(1.0, 4, -1.0:0.1:10.0)
+    @test DPHT.check_args(args, args4) == false
 end
 
 

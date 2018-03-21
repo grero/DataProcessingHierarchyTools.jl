@@ -9,6 +9,35 @@ const levels = ["subjects", "subject", "day", "session", "array", "channel", "ce
 const level_patterns = [r"[0-9A-Za-z]*", r"[0-9]{8}", r"session[0-9]{2}", r"array[0-9]{2}", r"channel[0-9]{3}", r"cell[0-9]{2}"]
 const level_patterns_s = ["*", "*", "[0-9]*", "session[0-9]*", "array[0-9]*", "channel[0-9]*", "cell[0-9]*"]
 
+function check_args(X1::T, X2::T) where T <: DPHDataArgs
+    matches = true
+    for f in fieldnames(T)
+        x1 = getfield(X1,f)
+        x2 = getfield(X2,f)
+        if typeof(x1) <: AbstractVector
+            if length(x1) != length(x2)
+                matches = false
+                break
+            end
+            for (_x1,_x2) in zip(x1,x2)
+                if _x1 != _x2
+                    matches = false
+                    break
+                end
+            end
+            if !matches
+                break
+            end
+        else
+            if !(x1 ≈ x2)
+                matches = false
+                break
+            end
+        end
+    end
+    matches
+end
+
 function check_args(X::T, args...) where T <: DPHDataArgs
     matches = true
     for (a0,a1) in zip(fieldnames(X), args)
