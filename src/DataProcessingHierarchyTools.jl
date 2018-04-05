@@ -2,7 +2,7 @@ __precompile__()
 module DataProcessingHierarchyTools
 using ProgressMeter
 using Glob
-import Base.hash
+import Base:hash,filter
 
 include("types.jl")
 
@@ -265,5 +265,25 @@ function load(::Type{T}, args...;kvs...) where T <: DPHData
         qq
     end
     qq
+end
+
+"""
+Return those directories among `dirs` where `func`,using arguments `args`,  returns true for an object whose arguments are compatible with  `typeargs`.
+"""
+function Base.filter(func::Function, typeargs::T2, dirs::Vector{String}, args...)  where T2 <: DPHDataArgs
+    outdirs = String[]
+    for d in dirs
+        cd(d) do
+            fname = filename(typeargs)
+            if isfile(fname)
+                X = load(typeargs)
+                aa = func(X,args...)
+                if aa
+                    push!(outdirs, d)
+                end
+            end
+        end
+    end
+    outdirs
 end
 end # module
