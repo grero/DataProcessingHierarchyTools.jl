@@ -109,6 +109,14 @@ matname(::Type{DPHData}) = error("Not implemented")
 save(X::DPHData) = error("Not implemented")
 load(::Type{DPHData}) = error("Not implemented")
 
+function load(args::T) where T <: DPHDataArgs
+    fname = filename(args)
+    if isfile(fname)
+        return load(datatype(T), fname)
+    end
+    error("No data exist with the specified arguments")
+end
+
 function plot_data(::Type{T},fig) where T <: DPHData
     error("Not implemented")
 end
