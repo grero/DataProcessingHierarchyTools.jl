@@ -13,6 +13,11 @@ const level_patterns_s = ["*", "*", "[0-9]*", "session[0-9]*", "array[0-9]*", "c
 #TODO: Find a way to (automatically) track dependency betweeen types. We could also just do this manually, i.e. have a depends_on function that lists types that a given type depends (directly) on. E.g. depends_on(Raster) = PSTH. If a type does not depend on any other types, just return an empty list
 depends_on(::Type{T}) where T <: DPHData = DataType[]
 
+"""
+Returns a list of files on which `args` depends.
+"""
+dependencies(args::T) where T <: DPHDataArgs = String[]
+
 function check_args(X1::T, X2::T) where T <: DPHDataArgs
     matches = true
     for f in fieldnames(T)
