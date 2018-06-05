@@ -104,6 +104,7 @@ level() = level(pwd())
 level(::Type{DPHData}) = error("Not implemented")
 filename(::Type{DPHData}) = error("Not implemented")
 datatype(::Type{DPHDataArgs}) = error("Not implemented")
+version(X::DPHDataArgs) = "UNKNOWN"
 
 function filename(args::T) where T <: DPHDataArgs
     fname = filename(datatype(T))
