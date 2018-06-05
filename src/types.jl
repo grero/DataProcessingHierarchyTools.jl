@@ -8,7 +8,7 @@ function Base.hash(args::T, h::UInt64) where T <: DPHDataArgs
             for _x in x
                 h = hash(_x, h)
             end
-        else
+        elseif !((f == :version) && (x == "UNKNOWN"))
             h = hash(x, h)
         end
     end
