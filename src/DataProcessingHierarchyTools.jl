@@ -2,7 +2,7 @@ __precompile__()
 module DataProcessingHierarchyTools
 using ProgressMeter
 using Glob
-import Base:hash,filter
+import Base:hash,filter,show
 
 include("types.jl")
 
@@ -304,5 +304,14 @@ function Base.filter(func::Function, typeargs::T2, dirs::Vector{String}, args...
         end
     end
     outdirs
+end
+
+function Base.show(io::IO, X::T) where T <: DPHDataArgs
+    compact = get(io, :compact, false)
+    print("$T with fields:\n")
+    for f in fieldnames(X)
+        v = getfield(X, f)
+        print(io, "\t$f = $v\n")
+    end
 end
 end # module
