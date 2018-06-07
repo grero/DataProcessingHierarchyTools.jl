@@ -311,7 +311,13 @@ function Base.show(io::IO, X::T) where T <: DPHDataArgs
     print("$T with fields:\n")
     for f in fieldnames(X)
         v = getfield(X, f)
-        print(io, "\t$f = $v\n")
+        if fieldtype(T, f) <: String
+            print(io, "\t$f = \"$v\"\n")
+        elseif fieldtype(T, f) <: Symbol
+            print(io, "\t$f = :$v\n")
+        else
+            print(io, "\t$f = $v\n")
+        end
     end
 end
 end # module
