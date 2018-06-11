@@ -127,7 +127,7 @@ function load(args::T) where T <: DPHDataArgs
     error("No data exist with the specified arguments")
 end
 
-function plot_data(::Type{T},fig) where T <: DPHData
+function plot_data(::Type{T},fig, args::T2, plotargs::T3) where T <: DPHData where T2 <: DPHDataArgs where T3 <: DPHPlotArgs
     error("Not implemented")
 end
 
