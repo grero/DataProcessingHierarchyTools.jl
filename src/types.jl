@@ -1,5 +1,9 @@
 abstract type DPHData end
 abstract type DPHDataArgs end
+abstract type DPHPlotArgs end
+
+struct DummyPlotArgs <: DPHPlotArgs
+end
 
 function Base.hash(args::T, h::UInt64) where T <: DPHDataArgs
     for f in fieldnames(args)
