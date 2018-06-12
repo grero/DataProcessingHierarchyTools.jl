@@ -14,7 +14,7 @@ end
 zero(::Type{TestData}) = TestData("", Int64[])
 
 DPHT.level(::Type{TestData}) = "session"
-DPHT.filename(::Type{TestData}) = "data.txt"
+DPHT.filename(::Type{TestData}) = "data.mat"
 
 function Base.hcat(X1::TestData, X2::TestData)
     ndata = "$(X1.data)$(X2.data)"
@@ -103,27 +103,6 @@ end
         end
         @test Y.data == "testtest"
         @test Y.setid == [1,2]
-        cd(dirs[1]) do
-            mkdir("array01")
-            cd("array01") do
-                q = DPHT.load(TestData)
-                @test q.data == "test"
-                @test  q.setid == [1]
-            end
-        end
-        cd(dirs[2]) do
-            rm(filename(TestData))
-            mkdir("array01")
-            cd("array01") do
-                q = DPHT.load(TestData)
-                @test q.data == ""
-                @test  q.setid == []
-            end
-        end
-
-        for d2 in dirs
-            rm(d2;recursive=true)
-        end
     end
 end
 
@@ -152,10 +131,28 @@ struct MyArgs <: DPHT.DPHDataArgs
 end
 
 struct MyData <: DPHT.DPHData
+    dd::Float64
     args::MyArgs
 end
+
 DPHT.filename(::Type{MyData}) = "mydata.mat"
 DPHT.datatype(::Type{MyArgs}) = MyData
+DPHT.level(::Type{MyData}) = "session"
+
+function MyData(args::MyArgs;force_redo=false, do_save=true)
+    fname = DPHT.filename(args)
+    redo = force_redo || !isfile(fname)
+    if !redo
+        X = DPHT.load(args)
+    else
+        x = args.f1*args.f2*sum(args.f3)
+        X = MyData(x, args)
+        if do_save
+            DPHT.save(X)
+        end
+    end
+    X
+end
 
 @testset "ArgsHash" begin
     args = MyArgs(1.0, 3, -1.0:0.5:10.0)
@@ -179,5 +176,35 @@ end
     @test DPHT.check_args(args, args4) == false
 end
 
+@testset "Save and load" begin
+    dd = tempdir()
+    args = MyArgs(1.0, 3, -1.0:0.5:10.0)
+    cd(dd) do
+        DPHT.visit_dirs(MyData, dirs, args)
+        cd(dirs[1]) do
+            X = MyData(args;do_save=true, force_redo=false)
+            mkdir("array01")
+            cd("array01") do
+                cd(DPHT.process_level(DPHT.level(MyData))) do
+                    X2 = MyData(args;do_save=true, force_redo=false)
+                    @test X.dd ≈ X2.dd
+                end
+            end
+        end
+        cd(dirs[2]) do
+            rm(DPHT.filename(args))
+            mkdir("array01")
+            cd("array01") do
+                cd(DPHT.process_level(DPHT.level(MyData))) do
+                    @test_throws ErrorException q = DPHT.load(TestData)
+                end
+            end
+        end
+
+        for d2 in dirs
+            rm(d2;recursive=true)
+        end
+    end
+end
 
 end#module
