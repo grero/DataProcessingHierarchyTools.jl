@@ -3,7 +3,7 @@ module DataProcessingHierarchyTools
 using ProgressMeter
 using Glob
 using MAT
-import Base:hash,filter,show
+import Base:hash,filter,show, convert
 
 include("types.jl")
 
@@ -288,49 +288,49 @@ end
 
 function save(X::T) where T <: DPHData
     fname = filename(X.args)
-    Q = Dict()
-    for _X in [X.args, X]
-        for f in fieldnames(_X)
-            if f == :args
-                continue
-            end
-            v = getfield(_X, f)
-            fs = string(f)
-            if typeof(v) <: AbstractVector
-                Q[fs] = collect(v)
-            elseif typeof(v) <: Symbol
-                Q[fs] = string(v)
-            else
-                Q[fs] = v
-            end
+    Q = convert(Dict{String,Any}, X) 
+    MAT.matwrite(fname,Q)
+end 
+
+function Base.convert(::Type{Dict{String,Any}}, X::T) where T <: Union{DPHData, DPHDataArgs}
+    Q = Dict{String,Any}()
+    for f in fieldnames(X)
+        v = getfield(X, f)
+        fs = string(f)
+        if typeof(v) <: AbstractVector
+            Q[fs] = collect(v)
+        elseif typeof(v) <: DPHDataArgs
+            Q[fs] = convert(Dict{String,Any}, v)
+        elseif typeof(v) <: Symbol
+            Q[fs] = string(v)
+        else
+            Q[fs] = v
         end
     end
-    MAT.matwrite(fname,Q)
+    Q
 end
 
 function load(::Type{T}, fname=filename(T)) where T <: DPHData 
     Q = MAT.matread(fname)
+    convert(T, Q)
+end
+
+function Base.convert(::Type{T}, Q::Dict{String, Any}) where T <: Union{DPHData, DPHDataArgs}
     a_args = Any[]
-    b_args = Any[]
-    TA = fieldtype(T, :args)
-    for (_args, _T) in zip([a_args, b_args],[TA,T])
-        for f in fieldnames(_T)
-            if f == :args
-                continue
-            end
-            tt = fieldtype(_T,f)
-            fs = string(f)
-            if tt <: Symbol
-                vv = Symbol(Q[fs])
-            else
-                vv = Q[fs]
-            end
-            push!(_args, vv)
+    for f in fieldnames(T)
+        tt = fieldtype(T,f)
+        fs = string(f)
+        if tt <: Symbol
+            vv = Symbol(Q[fs])
+        elseif tt <: DPHDataArgs
+            #handle arguments to other types here
+            vv = convert(tt, Q[fs])
+        else
+            vv = Q[fs]
         end
+        push!(a_args, vv)
     end
-    args = TA(a_args...)
-    push!(b_args, args)
-    T(b_args...)
+    T(a_args...)
 end
 
 """
