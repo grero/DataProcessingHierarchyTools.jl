@@ -130,7 +130,7 @@ function plot_data(::Type{T},fig, args::T2, plotargs::T3) where T <: DPHData whe
     error("Not implemented")
 end
 
-export DPHData, level, filename, plot_data, datatype
+export DPHData, level, filename, plot_data, datatype, BootstrappedDataArgs
 
 """
 Get the level of the directory represented by `cwd`.
