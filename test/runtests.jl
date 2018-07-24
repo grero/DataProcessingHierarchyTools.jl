@@ -59,6 +59,12 @@ dirs =["20140903/session01", "20140903/session02"]
     @test _name == "Pancake"
     _pth = DPHT.process_level("session", "Pancake/20130923/session01/array01/channel001")
     @test _pth == "./../.."
+    rpath = DPHT.get_relative_path("subjects", "newWorkingMemory/Pancake/20130923")
+    @test rpath == "Pancake/20130923"
+    rpath = DPHT.get_relative_path("day", "newWorkingMemory/Pancake/20130923")
+    @test rpath == "."
+    @test_throws ErrorException DPHT.get_relative_path("channel", "newWorkingMemory/Pancake/20130923")
+
     dd = tempdir()
     cd(dd) do
         for d2 in dirs

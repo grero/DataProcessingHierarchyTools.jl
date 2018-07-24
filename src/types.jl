@@ -2,6 +2,12 @@ abstract type DPHData end
 abstract type DPHDataArgs end
 abstract type DPHPlotArgs end
 
+struct BootstrappedDataArgs{T<:DPHDataArgs} <: DPHDataArgs
+    nruns::Int64
+    ntrials::Int64
+    args::T
+end
+
 struct DummyPlotArgs <: DPHPlotArgs
 end
 

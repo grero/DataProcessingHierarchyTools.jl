@@ -22,8 +22,10 @@ matrix:
 #  apt: # apt-get for linux
 #    packages:
 #    - gfortran
-#before_script: # homebrew for mac
-#  - if [ $TRAVIS_OS_NAME = osx ]; then brew install gcc; fi
+before_script: # homebrew for mac
+  - if [ $TRAVIS_OS_NAME = osx ]; then  rm /usr/local/include/c++; brew install gcc; fi
+  - if [ $TRAVIS_OS_NAME = osx ]; then brew link --overwrite gcc; fi
+  - if [ $TRAVIS_OS_NAME = osx ]; then brew install hdf5; fi
 
 ## uncomment the following lines to override the default test script
 #script:

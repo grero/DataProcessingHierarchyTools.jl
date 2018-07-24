@@ -20,3 +20,6 @@ using DataProcessingHierarchyTools
 const DPHT = DataProcessingHierarchyTools
 pth = DPHT.process_level("session", "Pancake/20130923/session01/array01/channel001")
 ```
+
+## Example 3
+For a new data to work with the DataProcessingHierarchyTools API, its definition needs to follow a certain patter. First, it should have a field `args` which should be a subtype of DataProcessingHierarchyTools.DPHDataArgs. This type should have a field consisting of simple types, i.e. scalars, strings and arrays.
