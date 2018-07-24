@@ -211,6 +211,27 @@ function process_level(target_level::String, dir=pwd();kvs...)
 end
 
 """
+Returns the path of the current directory relative to `level_dir`
+
+"""
+function get_relative_path(level_dir::String,dir=pwd())
+    this_level = level(dir)
+    this_idx = findfirst(l->this_level==l, levels)
+    target_idx = findfirst(l->level_dir==l, levels)
+    if target_idx+1 <= this_idx
+        parts = String[]
+        for ii in target_idx+1:this_idx
+            push!(parts, get_level_name(levels[ii],dir))
+        end
+    elseif target_idx == this_idx
+        parts = ["."]
+    else
+        error("Target level must be below the current level")
+    end
+    joinpath(parts...)
+end
+
+"""
 Process each directory in `dirs`, creating an object of type `T`, and returning a concatenation of those objects.
 """
 function process_dirs(::Type{T}, dirs::Vector{String}, args...;kvs...) where T <: DPHData
