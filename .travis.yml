@@ -23,7 +23,7 @@ matrix:
 #    packages:
 #    - gfortran
 before_script: # homebrew for mac
-  - if [ $TRAVIS_OS_NAME = osx ]; then brew unlink gcc; brew install gcc; fi
+  - if [ $TRAVIS_OS_NAME = osx ]; then  rm /usr/local/include/c++; brew install gcc; fi
   - if [ $TRAVIS_OS_NAME = osx ]; then brew link --overwrite gcc; fi
   - if [ $TRAVIS_OS_NAME = osx ]; then brew install hdf5; fi
 
