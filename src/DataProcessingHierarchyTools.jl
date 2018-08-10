@@ -346,6 +346,11 @@ function Base.convert(::Type{T}, Q::Dict{String, Any}) where T <: Union{DPHData,
         elseif tt <: DPHDataArgs
             #handle arguments to other types here
             vv = convert(tt, Q[fs])
+        elseif eltype(tt) <: Vector
+            x = Q[fs]
+            #clunky way of making sure that single element vectors are loaded as vectores and not singletons.
+            _tt = eltype(Q[fs])[1]
+            vv = [ifelse(isa(xx,Vector), xx, typeof(xx)[xx]) for xx in Q[fs]]
         else
             vv = Q[fs]
         end
