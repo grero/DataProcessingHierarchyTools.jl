@@ -121,7 +121,7 @@ matname(::Type{DPHData}) = error("Not implemented")
 function load(args::T) where T <: DPHDataArgs
     fname = filename(args)
     if isfile(fname)
-        return load(datatype(T), fname)
+        return load(datatype(args), fname)
     end
     error("No data exist with the specified arguments")
 end
@@ -318,12 +318,16 @@ function Base.convert(::Type{Dict{String,Any}}, X::T) where T <: Union{DPHData, 
     for f in fieldnames(X)
         v = getfield(X, f)
         fs = string(f)
-        if typeof(v) <: AbstractVector
+        tt = typeof(v)
+        if tt <: AbstractVector
             Q[fs] = collect(v)
-        elseif typeof(v) <: DPHDataArgs
+        elseif tt <: DPHDataArgs
             Q[fs] = convert(Dict{String,Any}, v)
-        elseif typeof(v) <: Symbol
+        elseif tt <: Symbol
             Q[fs] = string(v)
+        elseif !isempty(fieldnames(tt))
+            #composite type
+            Q[fs] = convert(Dict{String,Any}, v)
         else
             Q[fs] = v
         end
@@ -343,16 +347,13 @@ function Base.convert(::Type{T}, Q::Dict{String, Any}) where T <: Union{DPHData,
         fs = string(f)
         if tt <: Symbol
             vv = Symbol(Q[fs])
-        elseif tt <: DPHDataArgs
-            #handle arguments to other types here
-            vv = convert(tt, Q[fs])
         elseif eltype(tt) <: Vector
             x = Q[fs]
             #clunky way of making sure that single element vectors are loaded as vectores and not singletons.
             _tt = eltype(Q[fs])[1]
             vv = [ifelse(isa(xx,Vector), xx, typeof(xx)[xx]) for xx in Q[fs]]
         else
-            vv = Q[fs]
+            vv = convert(tt, Q[fs])
         end
         push!(a_args, vv)
     end

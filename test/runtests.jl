@@ -4,7 +4,7 @@ const DPHT = DataProcessingHierarchyTools
 import DataProcessingHierarchyTools:level, filename
 using Base.Test
 
-import Base:hcat, zero
+import Base:hcat, zero, convert
 
 struct TestData <: DPHData
     data::String
@@ -234,5 +234,46 @@ end
         @test X.d == X2.d
     end
 end
+
+struct MyTestType
+    a::Array{Float64,1}
+end
+
+struct MyData3Args <: DPHT.DPHDataArgs
+    a::MyTestType
+end
+
+struct MyData3 <: DPHT.DPHData
+    x::Float64
+    args::MyData3Args
+end
+
+DPHT.filename(::Type{MyData3}) = "test3.mat"
+DPHT.datatype(::Type{MyData3Args}) = MyData3
+
+function Base.convert(::Type{MyTestType}, Q::Dict{String,Any})
+    MyTestType(Q["a"])
+end
+
+function Base.convert(::Type{Dict{String,Any}}, X::MyTestType)
+    Q = Dict{String,Any}()
+    Q["a"] = X.a
+    Q
+end
+
+@testset "Deep type loading" begin
+    dd = tempdir()
+    cd(dd) do
+        aa = MyData3Args(MyTestType([1.0, 2.0]))
+        X = MyData3(1.0,aa)
+        DPHT.save(X)
+        X2 = DPHT.load(aa)
+        @test X.x == X2.x
+        @test X.args.a.a == X2.args.a.a
+        #cleanup 
+        rm(DPHT.filename(aa))
+    end
+end
+
 
 end#module
