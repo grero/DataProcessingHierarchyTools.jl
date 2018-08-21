@@ -318,12 +318,16 @@ function Base.convert(::Type{Dict{String,Any}}, X::T) where T <: Union{DPHData, 
     for f in fieldnames(X)
         v = getfield(X, f)
         fs = string(f)
-        if typeof(v) <: AbstractVector
+        tt = typeof(v)
+        if tt <: AbstractVector
             Q[fs] = collect(v)
-        elseif typeof(v) <: DPHDataArgs
+        elseif tt <: DPHDataArgs
             Q[fs] = convert(Dict{String,Any}, v)
-        elseif typeof(v) <: Symbol
+        elseif tt <: Symbol
             Q[fs] = string(v)
+        elseif !isempty(fieldnames(tt))
+            #composite type
+            Q[fs] = convert(Dict{String,Any}, v)
         else
             Q[fs] = v
         end
