@@ -160,6 +160,17 @@ function MyData(args::MyArgs;force_redo=false, do_save=true)
     X
 end
 
+struct MyData2Args <: DPHT.DPHDataArgs
+end
+
+struct MyData2 <: DPHT.DPHData
+    d::Vector{Vector{Float64}}
+    args::MyData2Args
+end
+
+DPHT.filename(::Type{MyData2}) = "mydata2.mat"
+DPHT.datatype(::Type{MyData2Args}) = MyData2
+
 @testset "ArgsHash" begin
     args = MyArgs(1.0, 3, -1.0:0.5:10.0)
     h = hash(args)
@@ -210,6 +221,17 @@ end
         for d2 in dirs
             rm(d2;recursive=true)
         end
+    end
+end
+
+@testset "Singleton loading" begin
+    dd = tempdir()
+    cd(dd) do
+        aa = MyData2Args()
+        X = MyData2([[1.0,2.0],[1.0]], aa)
+        DPHT.save(X)
+        X2 = DPHT.load(aa)
+        @test X.d == X2.d
     end
 end
 
