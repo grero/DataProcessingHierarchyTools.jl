@@ -213,4 +213,24 @@ end
     end
 end
 
+struct SArgs <: DPHT.DPHDataArgs
+    a::Int64
+end
+
+struct S <: DPHT.DPHData
+    μ::Vector{Float64}
+    Σ::Matrix{Float64}
+    args::SArgs
+end
+
+@testset "Variable sanitasion" begin
+    ss = S([0.0, 0.0], eye(2), SArgs(1.0))
+    Q = convert(Dict{String,Any}, ss)
+    @test Q["mu"] ≈ ss.μ
+    @test Q["Sigma"] ≈ ss.Σ
+
+    ss2 = convert(S, Q)
+    @test ss2.μ ≈ ss.μ
+    @test ss2.Σ ≈ ss.Σ
+end
 end#module

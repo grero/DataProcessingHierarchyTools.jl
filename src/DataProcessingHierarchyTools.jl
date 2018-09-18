@@ -307,6 +307,26 @@ function load(::Type{T}, args...;kvs...) where T <: DPHData
     qq
 end
 
+"""
+Convert some unicde symbols to their latex equivalent before saving
+"""
+function sanitise!(ss::String)
+    for p in ["Σ" => "Sigma", "μ" => "mu"]
+        ss = replace(ss, p)
+    end
+    ss
+end
+
+"""
+Convert from latex to unicode
+"""
+function desanitise!(ss::String)
+    for p in ["Sigma" => "Σ", "mu" => "μ"]
+        ss = replace(ss, p)
+    end
+    ss
+end
+
 function save(X::T) where T <: DPHData
     fname = filename(X.args)
     Q = convert(Dict{String,Any}, X) 
@@ -318,6 +338,7 @@ function Base.convert(::Type{Dict{String,Any}}, X::T) where T <: Union{DPHData, 
     for f in fieldnames(X)
         v = getfield(X, f)
         fs = string(f)
+        fs = sanitise!(fs)
         if typeof(v) <: AbstractVector
             Q[fs] = collect(v)
         elseif typeof(v) <: DPHDataArgs
@@ -341,6 +362,7 @@ function Base.convert(::Type{T}, Q::Dict{String, Any}) where T <: Union{DPHData,
     for f in fieldnames(T)
         tt = fieldtype(T,f)
         fs = string(f)
+        fs = sanitise!(fs)
         if tt <: Symbol
             vv = Symbol(Q[fs])
         elseif tt <: DPHDataArgs
