@@ -329,9 +329,9 @@ end
 
 function save(X::T) where T <: DPHData
     fname = filename(X.args)
-    Q = convert(Dict{String,Any}, X) 
+    Q = convert(Dict{String,Any}, X)
     MAT.matwrite(fname,Q)
-end 
+end
 
 function Base.convert(::Type{Dict{String,Any}}, X::T) where T <: Union{DPHData, DPHDataArgs}
     Q = Dict{String,Any}()
@@ -352,7 +352,7 @@ function Base.convert(::Type{Dict{String,Any}}, X::T) where T <: Union{DPHData, 
     Q
 end
 
-function load(::Type{T}, fname=filename(T)) where T <: DPHData 
+function load(::Type{T}, fname=filename(T)) where T <: DPHData
     Q = MAT.matread(fname)
     convert(T, Q)
 end
