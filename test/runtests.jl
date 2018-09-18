@@ -2,7 +2,8 @@ module DPHTTest
 using DataProcessingHierarchyTools
 const DPHT = DataProcessingHierarchyTools
 import DataProcessingHierarchyTools:level, filename
-using Base.Test
+using Test
+using LinearAlgebra
 
 import Base:hcat, zero
 
@@ -18,7 +19,7 @@ DPHT.filename(::Type{TestData}) = "data.mat"
 
 function Base.hcat(X1::TestData, X2::TestData)
     ndata = "$(X1.data)$(X2.data)"
-    setid = [X1.setid;X2.setid + X1.setid[end]]
+    setid = [X1.setid;X2.setid .+ X1.setid[end]]
     TestData(ndata, setid)
 end
 
@@ -224,7 +225,7 @@ struct S <: DPHT.DPHData
 end
 
 @testset "Variable sanitasion" begin
-    ss = S([0.0, 0.0], eye(2), SArgs(1.0))
+    ss = S([0.0, 0.0], Matrix{Float64}(I,2,2), SArgs(1.0))
     Q = convert(Dict{String,Any}, ss)
     @test Q["mu"] ≈ ss.μ
     @test Q["Sigma"] ≈ ss.Σ

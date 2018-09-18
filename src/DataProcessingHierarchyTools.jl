@@ -50,7 +50,7 @@ end
 
 function check_args(X::T, args...) where T <: DPHDataArgs
     matches = true
-    for (a0,a1) in zip(fieldnames(X), args)
+    for (a0,a1) in zip(fieldnames(T), args)
         x = getfield(X, a0)
         if typeof(x) <: AbstractVector
             if length(x) != length(a1)
@@ -282,7 +282,7 @@ end
 Process each directory in `dirs` by running the function `func`.
 """
 function process_dirs(func::Function, dirs::Vector{String}, args...;kvs...)
-    Q = Vector{Any}(length(dirs))
+    Q = Vector{Any}(undef, length(dirs))
     @showprogress 1 "Processing dirs..." for (i,d) in enumerate(dirs)
         Q[i] = cd(d) do
             func(args...;kvs...)
@@ -335,7 +335,7 @@ end
 
 function Base.convert(::Type{Dict{String,Any}}, X::T) where T <: Union{DPHData, DPHDataArgs}
     Q = Dict{String,Any}()
-    for f in fieldnames(X)
+    for f in fieldnames(T)
         v = getfield(X, f)
         fs = string(f)
         fs = sanitise!(fs)
