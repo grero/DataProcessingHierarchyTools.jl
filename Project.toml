@@ -1,5 +1,6 @@
 name = "DataProcessingHierarchyTools"
 uuid = "c4d60adb-60c8-55d6-9a12-9d581dce3acf"
+version = "0.5.0"
 author = "Roger Herikstad <roger.herikstad@gmail.com>"
 
 [deps]

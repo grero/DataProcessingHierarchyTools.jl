@@ -201,7 +201,7 @@ function process_level(target_level::String, dir=pwd();kvs...)
     this_idx = findfirst(l->this_level==l, levels)
     target_idx = findfirst(l->target_level==l, levels)
     for lidx in [this_idx, target_idx]
-        if !(0 < lidx <= length(levels))
+        if lidx == nothing || !(0 < lidx <= length(levels))
             throw(ArgumentError("Unknown level"))
         end
     end
