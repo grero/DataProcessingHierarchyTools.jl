@@ -110,7 +110,7 @@ version(X::DPHDataArgs) = "UNKNOWN"
 
 function filename(args::T) where T <: DPHDataArgs
     fname = filename(datatype(T))
-    h = hex(hash(args))
+    h = string(hash(args),base=16)
     bn, ext = splitext(fname)
     fname = join([bn, "_", h, ext])
     fname
