@@ -240,5 +240,11 @@ end
     ss2 = convert(S, Q)
     @test ss2.μ ≈ ss.μ
     @test ss2.Σ ≈ ss.Σ
+
+    Q = Dict{String,Any}("mu" => 1.0, "Sigma" => 0.5,
+                         "args" => Dict{String,Any}("a" => 3))
+    ss3 = convert(S, Q)
+    @test ss3.μ ≈ [1.0]
+    @test ss3.Σ ≈ fill(0.5, 1,1)
 end
 end#module

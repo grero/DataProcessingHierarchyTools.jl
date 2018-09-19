@@ -368,8 +368,10 @@ function Base.convert(::Type{T}, Q::Dict{String, Any}) where T <: Union{DPHData,
         elseif tt <: DPHDataArgs
             #handle arguments to other types here
             vv = convert(tt, Q[fs])
-        elseif tt <: AbstractVector
+        elseif tt <: AbstractVector && !(typeof(Q[fs]) <: AbstractVector)
             vv = eltype(tt)[Q[fs];]
+        elseif tt <: AbstractMatrix && !(typeof(Q[fs]) <: AbstractMatrix)
+            vv = fill(Q[fs], 1,1)
         else
             vv = Q[fs]
         end
