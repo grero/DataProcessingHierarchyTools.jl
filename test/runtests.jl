@@ -211,6 +211,13 @@ end
         for d2 in dirs
             rm(d2;recursive=true)
         end
+        args2 = MyArgs(1.0, 3, [1.0])
+        X = MyData(args2)
+        fname = DPHT.filename(args2)
+        @test isfile(fname)
+        X2 = MyData(args2)
+        @test X.args.f3 == X2.args.f3
+        rm(fname)
     end
 end
 
