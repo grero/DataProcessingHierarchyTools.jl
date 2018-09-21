@@ -389,8 +389,12 @@ function Base.filter(func::Function, typeargs::T2, dirs::Vector{String}, args...
         cd(d) do
             fname = filename(typeargs)
             if isfile(fname)
-                X = load(typeargs)
-                aa = func(X,args...)
+                aa = false
+                try
+                    X = load(typeargs)
+                    aa = func(X,args...)
+                catch
+                end
                 if aa
                     push!(outdirs, d)
                 end
