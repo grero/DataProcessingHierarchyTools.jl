@@ -24,3 +24,10 @@ function Base.hash(args::T, h::UInt64) where T <: DPHDataArgs
     end
     h
 end
+
+function Base.hash(args::Vector{T}, h::UInt64) where T <: DPHDataArgs
+    for _args in args
+        hash(_args, h)
+    end
+    h
+end

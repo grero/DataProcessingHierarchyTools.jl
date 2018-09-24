@@ -231,6 +231,9 @@ struct S <: DPHT.DPHData
     args::SArgs
 end
 
+DPHT.filename(::Type{S}) = "mydata.mat"
+DPHT.datatype(::Type{SArgs}) = S
+
 @testset "Variable sanitasion" begin
     ss = S([0.0, 0.0], Matrix{Float64}(I,2,2), SArgs(1.0))
     Q = convert(Dict{String,Any}, ss)
@@ -246,5 +249,29 @@ end
     ss3 = convert(S, Q)
     @test ss3.μ ≈ [1.0]
     @test ss3.Σ ≈ fill(0.5, 1,1)
+end
+
+@testset "Array of objects" begin
+    args = [SArgs(1.0), SArgs(2.0), SArgs(3.0)]
+    ss = S[]
+    for a in args
+        push!(ss, S([0.0, 0.0], [[0.1 0.1];[0.3 0.1]], a))
+    end
+    dd = tempdir()
+    cd(dd) do
+        DPHT.save(ss)
+        fname = DPHT.filename(args) 
+        ss2 = DPHT.load(Vector{S},fname)
+        @test ss2[1].args == args[1]
+        @test ss2[1].μ == ss[1].μ
+        @test ss2[1].Σ == ss[1].Σ
+        @test ss2[2].args == args[2]
+        @test ss2[2].μ == ss[2].μ
+        @test ss2[2].Σ == ss[2].Σ
+        @test ss2[3].args == args[3]
+        @test ss2[3].μ == ss[3].μ
+        @test ss2[3].Σ == ss[3].Σ
+        rm(fname)
+    end
 end
 end#module

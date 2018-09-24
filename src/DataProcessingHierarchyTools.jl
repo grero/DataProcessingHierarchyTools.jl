@@ -116,6 +116,14 @@ function filename(args::T) where T <: DPHDataArgs
     fname
 end
 
+function filename(args::Vector{T}) where T <: DPHDataArgs
+    fname = filename(datatype(T))
+    h = string(hash(args),base=16)
+    bn, ext = splitext(fname)
+    fname = join([bn, "_", h, ext])
+    fname
+end
+
 matname(::Type{DPHData}) = error("Not implemented")
 
 function load(args::T) where T <: DPHDataArgs
@@ -333,6 +341,15 @@ function save(X::T) where T <: DPHData
     MAT.matwrite(fname,Q)
 end
 
+function save(X::Vector{T}) where T <: DPHData
+    fname = filename([x.args for x in X])
+    Q = Dict{String, Dict{String,Any}}()
+    for (i,x) in enumerate(X)
+        Q["idx$(i)"] = convert(Dict{String,Any}, x)
+    end
+    MAT.matwrite(fname,Q)
+end
+
 function Base.convert(::Type{Dict{String,Any}}, X::T) where T <: Union{DPHData, DPHDataArgs}
     Q = Dict{String,Any}()
     for f in fieldnames(T)
@@ -355,6 +372,16 @@ end
 function load(::Type{T}, fname=filename(T)) where T <: DPHData
     Q = MAT.matread(fname)
     convert(T, Q)
+end
+
+function load(::Type{Vector{T}}, fname=filename{T}) where T <: DPHData
+    Q = MAT.matread(fname)
+    X = Vector{T}(undef, length(Q))
+    for (k,v) in Q
+        ii = parse(Int64, replace(k,"idx" => ""))
+        X[ii] = convert(T,v)
+    end
+    X
 end
 
 function Base.convert(::Type{T}, Q::Dict{String, Any}) where T <: Union{DPHData, DPHDataArgs}
