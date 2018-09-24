@@ -27,7 +27,7 @@ end
 
 function Base.hash(args::Vector{T}, h::UInt64) where T <: DPHDataArgs
     for _args in args
-        hash(_args, h)
+        h = hash(_args, h)
     end
     h
 end
