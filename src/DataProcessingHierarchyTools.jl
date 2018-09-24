@@ -134,6 +134,14 @@ function load(args::T) where T <: DPHDataArgs
     error("No data exist with the specified arguments")
 end
 
+function load(args::Vector{T}) where T <: DPHDataArgs
+    fname = filename(args)
+    if isfile(fname)
+        return load(Vector{datatype(T)}, fname)
+    end
+    error("No data exist with the specified arguments")
+end
+
 function plot_data(::Type{T},fig, args::T2, plotargs::T3) where T <: DPHData where T2 <: DPHDataArgs where T3 <: DPHPlotArgs
     error("Not implemented")
 end
