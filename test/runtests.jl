@@ -260,8 +260,7 @@ end
     dd = tempdir()
     cd(dd) do
         DPHT.save(ss)
-        fname = DPHT.filename(args) 
-        ss2 = DPHT.load(Vector{S},fname)
+        ss2 = DPHT.load(args)
         @test ss2[1].args == args[1]
         @test ss2[1].μ == ss[1].μ
         @test ss2[1].Σ == ss[1].Σ
@@ -271,6 +270,9 @@ end
         @test ss2[3].args == args[3]
         @test ss2[3].μ == ss[3].μ
         @test ss2[3].Σ == ss[3].Σ
+        fname = DPHT.filename(args)
+        h = hash(args)
+        @test h == 0xb6f003559185097d
         rm(fname)
     end
 end
