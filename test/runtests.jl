@@ -2,7 +2,8 @@ module DPHTTest
 using DataProcessingHierarchyTools
 const DPHT = DataProcessingHierarchyTools
 import DataProcessingHierarchyTools:level, filename
-using Base.Test
+using Test
+using LinearAlgebra
 
 import Base:hcat, zero
 
@@ -18,7 +19,7 @@ DPHT.filename(::Type{TestData}) = "data.mat"
 
 function Base.hcat(X1::TestData, X2::TestData)
     ndata = "$(X1.data)$(X2.data)"
-    setid = [X1.setid;X2.setid + X1.setid[end]]
+    setid = [X1.setid;X2.setid .+ X1.setid[end]]
     TestData(ndata, setid)
 end
 
@@ -210,7 +211,69 @@ end
         for d2 in dirs
             rm(d2;recursive=true)
         end
+        args2 = MyArgs(1.0, 3, [1.0])
+        X = MyData(args2)
+        fname = DPHT.filename(args2)
+        @test isfile(fname)
+        X2 = MyData(args2)
+        @test X.args.f3 == X2.args.f3
+        rm(fname)
     end
 end
 
+struct SArgs <: DPHT.DPHDataArgs
+    a::Int64
+end
+
+struct S <: DPHT.DPHData
+    μ::Vector{Float64}
+    Σ::Matrix{Float64}
+    args::SArgs
+end
+
+DPHT.filename(::Type{S}) = "mydata.mat"
+DPHT.datatype(::Type{SArgs}) = S
+
+@testset "Variable sanitasion" begin
+    ss = S([0.0, 0.0], Matrix{Float64}(I,2,2), SArgs(1.0))
+    Q = convert(Dict{String,Any}, ss)
+    @test Q["mu"] ≈ ss.μ
+    @test Q["Sigma"] ≈ ss.Σ
+
+    ss2 = convert(S, Q)
+    @test ss2.μ ≈ ss.μ
+    @test ss2.Σ ≈ ss.Σ
+
+    Q = Dict{String,Any}("mu" => 1.0, "Sigma" => 0.5,
+                         "args" => Dict{String,Any}("a" => 3))
+    ss3 = convert(S, Q)
+    @test ss3.μ ≈ [1.0]
+    @test ss3.Σ ≈ fill(0.5, 1,1)
+end
+
+@testset "Array of objects" begin
+    args = [SArgs(1.0), SArgs(2.0), SArgs(3.0)]
+    ss = S[]
+    for a in args
+        push!(ss, S([0.0, 0.0], [[0.1 0.1];[0.3 0.1]], a))
+    end
+    dd = tempdir()
+    cd(dd) do
+        DPHT.save(ss)
+        ss2 = DPHT.load(args)
+        @test ss2[1].args == args[1]
+        @test ss2[1].μ == ss[1].μ
+        @test ss2[1].Σ == ss[1].Σ
+        @test ss2[2].args == args[2]
+        @test ss2[2].μ == ss[2].μ
+        @test ss2[2].Σ == ss[2].Σ
+        @test ss2[3].args == args[3]
+        @test ss2[3].μ == ss[3].μ
+        @test ss2[3].Σ == ss[3].Σ
+        fname = DPHT.filename(args)
+        h = hash(args)
+        @test h == 0xb6f003559185097d
+        rm(fname)
+    end
+end
 end#module
