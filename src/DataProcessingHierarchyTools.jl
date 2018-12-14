@@ -50,7 +50,7 @@ end
 
 function check_args(X::T, args...) where T <: DPHDataArgs
     matches = true
-    for (a0,a1) in zip(fieldnames(X), args)
+    for (a0,a1) in zip(fieldnames(T), args)
         x = getfield(X, a0)
         if typeof(x) <: AbstractVector
             if length(x) != length(a1)
@@ -110,7 +110,15 @@ version(X::DPHDataArgs) = "UNKNOWN"
 
 function filename(args::T) where T <: DPHDataArgs
     fname = filename(datatype(T))
-    h = hex(hash(args))
+    h = string(hash(args),base=16)
+    bn, ext = splitext(fname)
+    fname = join([bn, "_", h, ext])
+    fname
+end
+
+function filename(args::Vector{T}) where T <: DPHDataArgs
+    fname = filename(datatype(T))
+    h = string(hash(args),base=16)
     bn, ext = splitext(fname)
     fname = join([bn, "_", h, ext])
     fname
@@ -121,7 +129,15 @@ matname(::Type{DPHData}) = error("Not implemented")
 function load(args::T) where T <: DPHDataArgs
     fname = filename(args)
     if isfile(fname)
-        return load(datatype(args), fname)
+        return load(datatype(T), fname)
+    end
+    error("No data exist with the specified arguments")
+end
+
+function load(args::Vector{T}) where T <: DPHDataArgs
+    fname = filename(args)
+    if isfile(fname)
+        return load(Vector{datatype(T)}, fname)
     end
     error("No data exist with the specified arguments")
 end
@@ -201,7 +217,7 @@ function process_level(target_level::String, dir=pwd();kvs...)
     this_idx = findfirst(l->this_level==l, levels)
     target_idx = findfirst(l->target_level==l, levels)
     for lidx in [this_idx, target_idx]
-        if !(0 < lidx <= length(levels))
+        if lidx == nothing || !(0 < lidx <= length(levels))
             throw(ArgumentError("Unknown level"))
         end
     end
@@ -282,7 +298,7 @@ end
 Process each directory in `dirs` by running the function `func`.
 """
 function process_dirs(func::Function, dirs::Vector{String}, args...;kvs...)
-    Q = Vector{Any}(length(dirs))
+    Q = Vector{Any}(undef, length(dirs))
     @showprogress 1 "Processing dirs..." for (i,d) in enumerate(dirs)
         Q[i] = cd(d) do
             func(args...;kvs...)
@@ -307,27 +323,53 @@ function load(::Type{T}, args...;kvs...) where T <: DPHData
     qq
 end
 
+"""
+Convert some unicde symbols to their latex equivalent before saving
+"""
+function sanitise!(ss::String)
+    for p in ["Σ" => "Sigma", "μ" => "mu"]
+        ss = replace(ss, p)
+    end
+    ss
+end
+
+"""
+Convert from latex to unicode
+"""
+function desanitise!(ss::String)
+    for p in ["Sigma" => "Σ", "mu" => "μ"]
+        ss = replace(ss, p)
+    end
+    ss
+end
+
 function save(X::T) where T <: DPHData
     fname = filename(X.args)
-    Q = convert(Dict{String,Any}, X) 
+    Q = convert(Dict{String,Any}, X)
     MAT.matwrite(fname,Q)
-end 
+end
+
+function save(X::Vector{T}) where T <: DPHData
+    fname = filename([x.args for x in X])
+    Q = Dict{String, Dict{String,Any}}()
+    for (i,x) in enumerate(X)
+        Q["idx$(i)"] = convert(Dict{String,Any}, x)
+    end
+    MAT.matwrite(fname,Q)
+end
 
 function Base.convert(::Type{Dict{String,Any}}, X::T) where T <: Union{DPHData, DPHDataArgs}
     Q = Dict{String,Any}()
-    for f in fieldnames(X)
+    for f in fieldnames(T)
         v = getfield(X, f)
         fs = string(f)
-        tt = typeof(v)
-        if tt <: AbstractVector
+        fs = sanitise!(fs)
+        if typeof(v) <: AbstractVector
             Q[fs] = collect(v)
-        elseif tt <: DPHDataArgs
+        elseif typeof(v) <: DPHDataArgs
             Q[fs] = convert(Dict{String,Any}, v)
-        elseif tt <: Symbol
+        elseif typeof(v) <: Symbol
             Q[fs] = string(v)
-        elseif !isempty(fieldnames(tt))
-            #composite type
-            Q[fs] = convert(Dict{String,Any}, v)
         else
             Q[fs] = v
         end
@@ -335,9 +377,19 @@ function Base.convert(::Type{Dict{String,Any}}, X::T) where T <: Union{DPHData, 
     Q
 end
 
-function load(::Type{T}, fname=filename(T)) where T <: DPHData 
+function load(::Type{T}, fname=filename(T)) where T <: DPHData
     Q = MAT.matread(fname)
     convert(T, Q)
+end
+
+function load(::Type{Vector{T}}, fname=filename{T}) where T <: DPHData
+    Q = MAT.matread(fname)
+    X = Vector{T}(undef, length(Q))
+    for (k,v) in Q
+        ii = parse(Int64, replace(k,"idx" => ""))
+        X[ii] = convert(T,v)
+    end
+    X
 end
 
 function Base.convert(::Type{T}, Q::Dict{String, Any}) where T <: Union{DPHData, DPHDataArgs}
@@ -345,15 +397,18 @@ function Base.convert(::Type{T}, Q::Dict{String, Any}) where T <: Union{DPHData,
     for f in fieldnames(T)
         tt = fieldtype(T,f)
         fs = string(f)
+        fs = sanitise!(fs)
         if tt <: Symbol
             vv = Symbol(Q[fs])
-        elseif eltype(tt) <: Vector
-            x = Q[fs]
-            #clunky way of making sure that single element vectors are loaded as vectores and not singletons.
-            _tt = eltype(Q[fs])[1]
-            vv = [ifelse(isa(xx,Vector), xx, typeof(xx)[xx]) for xx in Q[fs]]
-        else
+        elseif tt <: DPHDataArgs
+            #handle arguments to other types here
             vv = convert(tt, Q[fs])
+        elseif tt <: AbstractVector && !(typeof(Q[fs]) <: AbstractVector)
+            vv = eltype(tt)[Q[fs];]
+        elseif tt <: AbstractMatrix && !(typeof(Q[fs]) <: AbstractMatrix)
+            vv = fill(Q[fs], 1,1)
+        else
+            vv = Q[fs]
         end
         push!(a_args, vv)
     end
@@ -369,8 +424,12 @@ function Base.filter(func::Function, typeargs::T2, dirs::Vector{String}, args...
         cd(d) do
             fname = filename(typeargs)
             if isfile(fname)
-                X = load(typeargs)
-                aa = func(X,args...)
+                aa = false
+                try
+                    X = load(typeargs)
+                    aa = func(X,args...)
+                catch
+                end
                 if aa
                     push!(outdirs, d)
                 end
