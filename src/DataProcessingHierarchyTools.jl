@@ -448,7 +448,7 @@ end
 function Base.show(io::IO, X::T) where T <: DPHDataArgs
     compact = get(io, :compact, false)
     print("$T with fields:\n")
-    for f in fieldnames(X)
+    for f in fieldnames(T)
         v = getfield(X, f)
         if fieldtype(T, f) <: String
             print(io, "\t$f = \"$v\"\n")
