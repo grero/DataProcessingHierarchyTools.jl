@@ -197,6 +197,9 @@ function get_level_dirs(target_level::String, dir=pwd())
             dirs = glob(joinpath(level_patterns_s[this_idx+1:target_idx]...))
         end
     end
+    if dir != pwd()
+        dirs = [joinpath(dir, d) for d in dirs]
+    end
     dirs
 end
 
@@ -418,7 +421,7 @@ end
 """
 Return those directories among `dirs` where `func`,using arguments `args`,  returns true for an object whose arguments are compatible with  `typeargs`.
 """
-function Base.filter(func::Function, typeargs::T2, dirs::Vector{String}, args...)  where T2 <: DPHDataArgs
+function Base.filter(func::Function, typeargs::T2, dirs::Vector{String}, args...;verbose=0)  where T2 <: DPHDataArgs
     outdirs = String[]
     for d in dirs
         cd(d) do
@@ -429,6 +432,9 @@ function Base.filter(func::Function, typeargs::T2, dirs::Vector{String}, args...
                     X = load(typeargs)
                     aa = func(X,args...)
                 catch
+                    if verbose > 0
+                        rethrow()
+                    end
                 end
                 if aa
                     push!(outdirs, d)

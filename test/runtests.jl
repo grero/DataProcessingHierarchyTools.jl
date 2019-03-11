@@ -85,6 +85,9 @@ dirs =["20140903/session01", "20140903/session02"]
             @test session_dirs[1] == "./../session01"
             @test session_dirs[2] == "./../session02"
         end
+        dirsn = DPHT.get_level_dirs("session",dirs[1])
+        @test dirsn[1] == "20140903/session01/./../session01"
+        @test dirsn[2] == "20140903/session01/./../session02"
         dirsn = DPHT.get_level_dirs("session")
         @test dirsn[1] == dirs[1]
         @test dirsn[2] == dirs[2]
