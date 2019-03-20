@@ -204,6 +204,25 @@ function get_level_dirs(target_level::String, dir=pwd())
 end
 
 """
+Get all unique level directories contained in `dirs`.
+"""
+function get_level_dirs(level::String, dirs::Vector{String})
+    cwd = pwd()
+    level_dirs = String[]
+    for c in dirs
+        cd(c) do
+            cd(process_level(level))
+            _dir = pwd()
+            _dir = strip(replace(_dir, cwd => ""), '/')
+            if !(_dir in level_dirs)
+                push!(level_dirs, _dir)
+            end
+        end
+    end
+    level_dirs
+end
+
+"""
 Returns the relative path to an object of type `T`, using `dir` as the starting point.
 """
 function process_level(::Type{T}, dir=pwd();kvs...) where T <: DPHData
