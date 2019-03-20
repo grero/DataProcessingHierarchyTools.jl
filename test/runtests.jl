@@ -76,6 +76,8 @@ dirs =["20140903/session01", "20140903/session02"]
         for d2 in dirs
             @test isfile("$(d2)/test.txt")
         end
+        level_dirs = DPHT.get_level_dirs("session", dirs)
+        @test level_dirs == dirs
         #cleanup
         cd(dirs[1]) do
             thislevel = DPHT.level()
