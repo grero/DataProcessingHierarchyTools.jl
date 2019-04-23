@@ -97,6 +97,12 @@ dirs =["20140903/session01", "20140903/session02"]
             rm(d2;recursive=true)
         end
     end
+    ss = "/tmp/temp2/Pancake/20130923/session01/array01/channel001/cell01"
+    pp = DPHT.get_fullname(ss)
+    @test pp == joinpath("Pancake","20130923","session01","array01","channel001","cell01")
+    ss = "/tmp/temp2/Pancake"
+    pp = DPHT.get_fullname(ss)
+    @test pp == "Pancake"
 end
 
 @testset "Types" begin
