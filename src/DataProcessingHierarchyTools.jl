@@ -169,7 +169,7 @@ Get the level of the directory represented by `cwd`.
 function level(cwd::String)
     numbers = map(x->first(string(x)), 0:9)
     dd = last(splitdir(cwd))
-    ss = rstrip(dd, numbers)
+    ss = string(rstrip(dd, numbers))
     if isempty(ss)
         # only numbers; assume this is a date
         ss = "day"
