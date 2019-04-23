@@ -101,6 +101,21 @@ function get_shortname(ss::String)
     join(reverse(qs),"")
 end
 
+"""
+Returns the full name of the current level
+"""
+function get_fullname(ss=pwd())
+    this_level = level(ss)
+    this_idx = findfirst(l->this_level==l, levels)
+    pp = [get_level_name(this_level, ss)]
+    while this_idx > 2
+        this_idx -= 1
+        this_level = levels[this_idx]
+        push!(pp, get_level_name(this_level, ss))
+    end
+    joinpath(reverse(pp)...)
+end
+
 level() = level(pwd())
 level(::Type{DPHData}) = error("Not implemented")
 filename(::Type{DPHData}) = error("Not implemented")
