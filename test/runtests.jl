@@ -316,7 +316,6 @@ end
                 fname = DPHT.filename(s_args)
                 run(`$(DPHT.git_annex()) drop --force --from origin $fname`)
                 run(`$(DPHT.git_annex()) drop --force $fname`)
-                run(`git commit -m "did something"`)
             end
         end
         #cleanup
