@@ -287,4 +287,44 @@ end
         rm(fname)
     end
 end
+
+@testset "git-annex" begin
+    tdir = tempdir()
+    s_args = SArgs(2)
+    ss = S([0.1], [0.0 1.0; 1.0 0.0], s_args)
+    cd(tdir) do
+        mkpath("testdata")
+        cd("testdata") do
+            DPHT.save(ss)
+            if DPHT.git_annex() != nothing
+                run(`git init`)
+                run(`$(DPHT.git_annex()) init .`)
+                run(`$(DPHT.git_annex()) add .`)
+                mkpath("../testdata2")
+                cd("../testdata2") do
+                    run(`git init --bare `)
+                end
+                run(`git remote add origin ../testdata2`)
+                run(`$(DPHT.git_annex()) sync origin`)
+                run(`$(DPHT.git_annex()) copy -t origin .`)
+                run(`$(DPHT.git_annex()) drop .`)
+            end
+            ss2 = DPHT.load(s_args)
+            @test ss2.args.a == ss.args.a
+            #cleanup
+            if DPHT.git_annex() != nothing
+                fname = DPHT.filename(s_args)
+                run(`$(DPHT.git_annex()) drop --force --from origin $fname`)
+                run(`git rm $(fname)`)
+                run(`git commit -m "did something"`)
+            end
+        end
+        #cleanup
+
+        rm("testdata", recursive=true)
+        if isdir("testdata2")
+            rm("testdata2", recursive=true)
+        end
+    end
+end
 end#module
