@@ -7,6 +7,15 @@ import Base:hash,filter,show, convert
 
 include("types.jl")
 
+function git_annex()
+    cmd = nothing
+    try
+        cmd = readchomp(`which git-annex`)
+    catch ee
+    end
+    return cmd
+end
+
 const levels = ["subjects", "subject", "day", "session", "array", "channel", "cell"]
 const level_patterns = [r"[0-9A-Za-z]*", r"[0-9]{8}", r"session[0-9]{2}", r"array[0-9]{2}", r"channel[0-9]{3}", r"cell[0-9]{2}"]
 const level_patterns_s = ["*", "*", "[0-9]*", "session[0-9]*", "array[0-9]*", "channel[0-9]*", "cell[0-9]*"]
@@ -143,6 +152,9 @@ matname(::Type{DPHData}) = error("Not implemented")
 
 function load(args::T) where T <: DPHDataArgs
     fname = filename(args)
+    if islink(fname) && git_annex != nothing
+        run(`$(git_annex()) get $fname`)
+    end
     if isfile(fname)
         return load(datatype(T), fname)
     end
