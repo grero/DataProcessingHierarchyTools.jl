@@ -161,6 +161,15 @@ function load(args::T) where T <: DPHDataArgs
     error("No data exist with the specified arguments")
 end
 
+"""
+Returns `true` if the data described by `args` has already been 
+computed
+"""
+function computed(args::T) where T <: DPHDataArgs
+    fname = filename(args)
+    return isfile(fname) || islink(fname)
+end
+
 function load(args::Vector{T}) where T <: DPHDataArgs
     fname = filename(args)
     if isfile(fname)
