@@ -309,6 +309,7 @@ end
                 run(`$(DPHT.git_annex()) copy -t origin .`)
                 run(`$(DPHT.git_annex()) drop .`)
             end
+            @test DPHT.computed(s_args)
             ss2 = DPHT.load(s_args)
             @test ss2.args.a == ss.args.a
             #cleanup
