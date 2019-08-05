@@ -152,13 +152,7 @@ matname(::Type{DPHData}) = error("Not implemented")
 
 function load(args::T) where T <: DPHDataArgs
     fname = filename(args)
-    if islink(fname) && git_annex != nothing
-        run(`$(git_annex()) get $fname`)
-    end
-    if isfile(fname)
-        return load(datatype(T), fname)
-    end
-    error("No data exist with the specified arguments")
+    load(datatype(T), fname)
 end
 
 """
@@ -436,7 +430,14 @@ function Base.convert(::Type{Dict{String,Any}}, X::T) where T <: Union{DPHData, 
 end
 
 function load(::Type{T}, fname=filename(T)) where T <: DPHData
-    Q = MAT.matread(fname)
+    if islink(fname) && git_annex != nothing
+        run(`$(git_annex()) get $fname`)
+    end
+    if isfile(fname)
+        Q = MAT.matread(fname)
+    else
+        error("No data exist with the specified arguments")
+    end
     convert(T, Q)
 end
 
