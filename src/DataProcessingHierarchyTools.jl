@@ -395,8 +395,7 @@ function desanitise!(ss::String)
     ss
 end
 
-function save(X::T) where T <: DPHData
-    fname = filename(X.args)
+function save(X::T, fname=filename(X.args)) where T <: DPHData
     Q = convert(Dict{String,Any}, X)
     MAT.matwrite(fname,Q)
 end
