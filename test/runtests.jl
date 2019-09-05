@@ -251,10 +251,12 @@ DPHT.datatype(::Type{SArgs}) = S
     Q = convert(Dict{String,Any}, ss)
     @test Q["mu"] ≈ ss.μ
     @test Q["Sigma"] ≈ ss.Σ
+    @test Q["alpha0"] ≈ ss.α0
 
     ss2 = convert(S, Q)
     @test ss2.μ ≈ ss.μ
     @test ss2.Σ ≈ ss.Σ
+    @test ss2.α0 ≈ ss.α0
 
     Q = Dict{String,Any}("mu" => 1.0, "Sigma" => 0.5,
                          "alpha0" => 0.05,
@@ -262,6 +264,14 @@ DPHT.datatype(::Type{SArgs}) = S
     ss3 = convert(S, Q)
     @test ss3.μ ≈ [1.0]
     @test ss3.Σ ≈ fill(0.5, 1,1)
+    @test ss3.α0 ≈ 0.05
+
+    ss2 = DPHT.desanitise("mu0")
+    @test ss2 == "μ0"
+    ss2 = DPHT.desanitise("mu_f")
+    @test ss2 == "μ_f"
+    ss2 = DPHT.desanitise("alpha_0f")
+    @test ss2 == "α_0f"
 end
 
 @testset "Array of objects" begin
