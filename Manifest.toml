@@ -1,3 +1,5 @@
+# This file is machine-generated - editing it directly is not advised
+
 [[Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
 
@@ -8,10 +10,10 @@ uuid = "9e28174c-4ba2-5203-b857-d8d62c4213ee"
 version = "0.8.10"
 
 [[BinaryProvider]]
-deps = ["Libdl", "Pkg", "SHA", "Test"]
-git-tree-sha1 = "055eb2690182ebc31087859c3dd8598371d3ef9e"
+deps = ["Libdl", "Logging", "SHA"]
+git-tree-sha1 = "c7361ce8a2129f20b0e05a89f7070820cfed6648"
 uuid = "b99e7846-7c00-51b0-8f62-c81ae34c0232"
-version = "0.5.3"
+version = "0.5.6"
 
 [[Blosc]]
 deps = ["BinaryProvider", "CMakeWrapper", "Compat", "Libdl"]
@@ -26,25 +28,22 @@ uuid = "e1450e63-4bb3-523b-b2a4-4ffa8c0fd77d"
 version = "1.0.0"
 
 [[CMake]]
-deps = ["BinDeps", "Libdl", "Test"]
-git-tree-sha1 = "74853a75c26a4a73ac391ee26ee29ebeb5583d9f"
+deps = ["BinDeps"]
+git-tree-sha1 = "c67a8689dc5444adc5eb2be7d837100340ecba11"
 uuid = "631607c0-34d2-5d66-819e-eb0f9aa2061a"
-version = "1.1.0"
+version = "1.1.2"
 
 [[CMakeWrapper]]
 deps = ["BinDeps", "CMake", "Libdl", "Parameters", "Test"]
-git-tree-sha1 = "2b43d451639984e3571951cc687b8509b0a86c6d"
+git-tree-sha1 = "16d4acb3d37dc05b714977ffefa8890843dc8985"
 uuid = "d5fb7624-851a-54ee-a528-d3f3bac0b4a0"
-version = "0.2.2"
-
-[[CRC32c]]
-uuid = "8bf52ea8-c179-5cab-976a-9e18b702a9bc"
+version = "0.2.3"
 
 [[Compat]]
 deps = ["Base64", "Dates", "DelimitedFiles", "Distributed", "InteractiveUtils", "LibGit2", "Libdl", "LinearAlgebra", "Markdown", "Mmap", "Pkg", "Printf", "REPL", "Random", "Serialization", "SharedArrays", "Sockets", "SparseArrays", "Statistics", "Test", "UUIDs", "Unicode"]
-git-tree-sha1 = "ec61a16eed883ad0cfa002d7489b3ce6d039bb9a"
+git-tree-sha1 = "84aa74986c5b9b898b0d1acaf3258741ee64754f"
 uuid = "34da2185-b29b-5c13-b0c7-acf172513d20"
-version = "1.4.0"
+version = "2.1.0"
 
 [[Dates]]
 deps = ["Printf"]
@@ -55,7 +54,7 @@ deps = ["Mmap"]
 uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 
 [[Distributed]]
-deps = ["LinearAlgebra", "Random", "Serialization", "Sockets"]
+deps = ["Random", "Serialization", "Sockets"]
 uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[Glob]]
@@ -65,44 +64,20 @@ uuid = "c27321d9-0574-5035-807b-f59d2c89b15c"
 version = "1.2.0"
 
 [[HDF5]]
-deps = ["BinDeps", "Blosc", "CRC32c", "Distributed", "Homebrew", "Libdl", "LinearAlgebra", "Mmap", "Pkg", "Test", "WinRPM"]
-git-tree-sha1 = "2b55a7e957923fa15688c97e91198a3ff24155d2"
+deps = ["BinaryProvider", "Blosc", "CMakeWrapper", "Libdl", "Mmap"]
+git-tree-sha1 = "9f7e7eebd3cd46e541928ef6f1d5b992abd8d384"
 uuid = "f67ccb44-e63f-5c2f-98bd-6dc0ccc4ba2f"
-version = "0.10.3"
-
-[[HTTPClient]]
-deps = ["Compat", "LibCURL"]
-git-tree-sha1 = "161d5776ae8e585ac0b8c20fb81f17ab755b3671"
-uuid = "0862f596-cf2d-50af-8ef4-f2be67dfa83f"
-version = "0.2.1"
-
-[[Homebrew]]
-deps = ["BinDeps", "InteractiveUtils", "JSON", "Libdl", "Test", "Unicode"]
-git-tree-sha1 = "5582ec74f735cf8d12e562a2e65c47f34063bd51"
-uuid = "d9be37ee-ecc9-5288-90f1-b9ca67657a75"
-version = "0.7.0"
+version = "0.12.3"
 
 [[InteractiveUtils]]
-deps = ["LinearAlgebra", "Markdown"]
+deps = ["Markdown"]
 uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 
-[[JSON]]
-deps = ["Dates", "Distributed", "Mmap", "Sockets", "Test", "Unicode"]
-git-tree-sha1 = "1f7a25b53ec67f5e9422f1f551ee216503f4a0fa"
-uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
-version = "0.20.0"
-
-[[LibCURL]]
-deps = ["BinaryProvider", "Compat", "Libdl", "Printf"]
-git-tree-sha1 = "6339c87cb76923a3cf947fcd213cbc364355c9c9"
-uuid = "b27032c2-a3e7-50c8-80cd-2d36dbcbfd21"
-version = "0.4.1"
-
-[[LibExpat]]
-deps = ["Compat"]
-git-tree-sha1 = "fde352ec13479e2f90e57939da2440fb78c5e388"
-uuid = "522f3ed2-3f36-55e3-b6df-e94fee9b0c07"
-version = "0.5.0"
+[[LaTeX_Entities]]
+deps = ["LightXML", "StrTables"]
+git-tree-sha1 = "8cbd80230cfdde937d5e317a47792d1753309f57"
+uuid = "9927f19a-46ce-5bdd-a20a-f46a78b61e3d"
+version = "1.0.0"
 
 [[LibGit2]]
 uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
@@ -115,6 +90,12 @@ deps = ["BufferedStreams", "Random", "Test"]
 git-tree-sha1 = "d405194ffc0293c3519d4f7251ce51baac9cc871"
 uuid = "2ec943e9-cfe8-584d-b93d-64dcb6d567b7"
 version = "1.0.0"
+
+[[LightXML]]
+deps = ["BinaryProvider", "Libdl", "Test"]
+git-tree-sha1 = "aeec7a341652d47bc773475a42952fa78eccd7cc"
+uuid = "9c8b4983-aa76-5018-a973-4c85ecc9e179"
+version = "0.8.0"
 
 [[LinearAlgebra]]
 deps = ["Libdl"]
@@ -129,7 +110,7 @@ git-tree-sha1 = "bb06f887187ca916c171340de28b93f598e2be59"
 repo-rev = "v0.7-update"
 repo-url = "https://github.com/halleysfifthinc/MAT.jl"
 uuid = "23992714-dd62-5051-b70f-ba57cb901cac"
-version = "0.4.0+"
+version = "0.5.0+"
 
 [[Markdown]]
 deps = ["Base64"]
@@ -140,15 +121,15 @@ uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 
 [[OrderedCollections]]
 deps = ["Random", "Serialization", "Test"]
-git-tree-sha1 = "85619a3f3e17bb4761fe1b1fd47f0e979f964d5b"
+git-tree-sha1 = "c4c13474d23c60d20a67b217f1d7f22a40edf8f1"
 uuid = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
-version = "1.0.2"
+version = "1.1.0"
 
 [[Parameters]]
-deps = ["Markdown", "OrderedCollections", "REPL", "Test"]
-git-tree-sha1 = "70bdbfb2bceabb15345c0b54be4544813b3444e4"
+deps = ["OrderedCollections"]
+git-tree-sha1 = "1dfd7cd50a8eb06ef693a4c2bbe945943cd000c5"
 uuid = "d96e819e-fc66-5662-9728-84c9c7592b0a"
-version = "0.10.3"
+version = "0.11.0"
 
 [[Pkg]]
 deps = ["Dates", "LibGit2", "Markdown", "Printf", "REPL", "Random", "SHA", "UUIDs"]
@@ -193,6 +174,12 @@ uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 deps = ["LinearAlgebra", "SparseArrays"]
 uuid = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
+[[StrTables]]
+deps = ["Dates"]
+git-tree-sha1 = "5998faae8c6308acc25c25896562a1e66a3bb038"
+uuid = "9700d1a9-a7c8-5760-9816-a99fda30bb8f"
+version = "1.0.1"
+
 [[Test]]
 deps = ["Distributed", "InteractiveUtils", "Logging", "Random"]
 uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
@@ -204,14 +191,8 @@ uuid = "30578b45-9adc-5946-b283-645ec420af67"
 version = "0.4.0"
 
 [[UUIDs]]
-deps = ["Random"]
+deps = ["Random", "SHA"]
 uuid = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
 
 [[Unicode]]
 uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
-
-[[WinRPM]]
-deps = ["BinDeps", "Compat", "HTTPClient", "LibExpat", "Libdl", "Libz", "URIParser"]
-git-tree-sha1 = "2a889d320f3b77d17c037f295859fe570133cfbf"
-uuid = "c17dfb99-b4f7-5aad-8812-456da1ad7187"
-version = "0.4.2"
