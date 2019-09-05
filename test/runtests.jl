@@ -239,6 +239,7 @@ end
 struct S <: DPHT.DPHData
     μ::Vector{Float64}
     Σ::Matrix{Float64}
+    α0::Float64
     args::SArgs
 end
 
@@ -246,7 +247,7 @@ DPHT.filename(::Type{S}) = "mydata.mat"
 DPHT.datatype(::Type{SArgs}) = S
 
 @testset "Variable sanitasion" begin
-    ss = S([0.0, 0.0], Matrix{Float64}(I,2,2), SArgs(1.0))
+    ss = S([0.0, 0.0], Matrix{Float64}(I,2,2), 0.05, SArgs(1.0))
     Q = convert(Dict{String,Any}, ss)
     @test Q["mu"] ≈ ss.μ
     @test Q["Sigma"] ≈ ss.Σ
@@ -256,6 +257,7 @@ DPHT.datatype(::Type{SArgs}) = S
     @test ss2.Σ ≈ ss.Σ
 
     Q = Dict{String,Any}("mu" => 1.0, "Sigma" => 0.5,
+                         "alpha0" => 0.05,
                          "args" => Dict{String,Any}("a" => 3))
     ss3 = convert(S, Q)
     @test ss3.μ ≈ [1.0]
@@ -266,7 +268,7 @@ end
     args = [SArgs(1.0), SArgs(2.0), SArgs(3.0)]
     ss = S[]
     for a in args
-        push!(ss, S([0.0, 0.0], [[0.1 0.1];[0.3 0.1]], a))
+        push!(ss, S([0.0, 0.0], [[0.1 0.1];[0.3 0.1]], 0.05, a))
     end
     dd = tempdir()
     cd(dd) do
@@ -291,7 +293,7 @@ end
 @testset "git-annex" begin
     tdir = tempdir()
     s_args = SArgs(2)
-    ss = S([0.1], [0.0 1.0; 1.0 0.0], s_args)
+    ss = S([0.1], [0.0 1.0; 1.0 0.0], 0.05, s_args)
     cd(tdir) do
         mkpath("testdata")
         cd("testdata") do
