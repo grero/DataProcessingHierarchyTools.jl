@@ -3,9 +3,12 @@ module DataProcessingHierarchyTools
 using ProgressMeter
 using Glob
 using MAT
+using StrTables, LaTeX_Entities
 import Base:hash,filter,show, convert
 
 include("types.jl")
+
+const def = LaTeX_Entities.default
 
 function git_annex()
     cmd = nothing
@@ -378,21 +381,33 @@ end
 """
 Convert some unicde symbols to their latex equivalent before saving
 """
-function sanitise!(ss::String)
-    for p in ["Σ" => "Sigma", "μ" => "mu"]
-        ss = replace(ss, p)
+function sanitise(ss::String)
+    oo = String[]
+    for (i,c) in enumerate(ss)
+        sc = string(c)
+        m = matches(def, sc)
+        if !isempty(m)
+            push!(oo, m[1])
+        else
+            push!(oo, sc)
+        end
     end
-    ss
+    join(oo, "")
 end
 
-"""
-Convert from latex to unicode
-"""
-function desanitise!(ss::String)
-    for p in ["Sigma" => "Σ", "mu" => "μ"]
-        ss = replace(ss, p)
+function desanitise(ss::String)
+    oo = String[]
+    ss_split = split(ss, "_")
+    for _ss in ss_split
+        _nss = filter(!isdigit, _ss)
+        ll = lookupname(def, _nss)
+        if isempty(ll)
+            ll = _nss
+        end
+        lln = replace(_ss, _nss => ll)
+        push!(oo, lln)
     end
-    ss
+    join(oo, "_")
 end
 
 function save(X::T) where T <: DPHData
@@ -415,7 +430,7 @@ function Base.convert(::Type{Dict{String,Any}}, X::T) where T <: Union{DPHData, 
     for f in fieldnames(T)
         v = getfield(X, f)
         fs = string(f)
-        fs = sanitise!(fs)
+        fs = sanitise(fs)
         if typeof(v) <: AbstractVector
             Q[fs] = collect(v)
         elseif typeof(v) <: DPHDataArgs
@@ -456,7 +471,7 @@ function Base.convert(::Type{T}, Q::Dict{String, Any}) where T <: Union{DPHData,
     for f in fieldnames(T)
         tt = fieldtype(T,f)
         fs = string(f)
-        fs = sanitise!(fs)
+        fs = sanitise(fs)
         if tt <: Symbol
             vv = Symbol(Q[fs])
         elseif tt <: DPHDataArgs
