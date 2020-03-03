@@ -530,15 +530,26 @@ function Base.show(io::IO, X::T) where T <: DPHDataArgs
     end
 end
 
-function findargs(::Type{T}, cwd=pwd()) where T <: DPHData
+function findargs(::Type{T}, cwd=pwd();kvs...) where T <: DPHData
 	fname = filename(T)
 	fname = replace(fname, ".mat" => "*.mat")
+	arg_type = fieldtype(T, :args)
+	targs = filter(k->k[1] in fieldnames(arg_type), kvs)
 	args = cd(cwd) do
 		files = glob(fname)
-		args = Vector{fieldtype(T, :args)}(undef, length(files))
+		args = arg_type[]
 		for (ii,ff) in enumerate(files)
 			X = load(T, ff)
-			args[ii] = X.args
+			found = true
+			for (k,v) in targs
+				if getfield(X.args,k) != v
+					found = false
+					break
+				end
+			end
+			if found
+				push!(args, X.args)
+			end
 		end
 		args
 	end
