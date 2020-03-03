@@ -529,4 +529,19 @@ function Base.show(io::IO, X::T) where T <: DPHDataArgs
         end
     end
 end
+
+function findargs(::Type{T}, cwd=pwd()) where T <: DPHData
+	fname = filename(T)
+	fname = replace(fname, ".mat" => "*.mat")
+	args = cd(cwd) do
+		files = glob(fname)
+		args = Vector{fieldtype(T, :args)}(undef, length(files))
+		for (ii,ff) in enumerate(files)
+			X = load(T, ff)
+			args[ii] = X.args
+		end
+		args
+	end
+	args
+end
 end # module
