@@ -305,6 +305,8 @@ end
 		@test findfirst(x->x.a==args[1].a,args2) != nothing
 		@test findfirst(x->x.a==args[2].a,args2) != nothing
 		@test findfirst(x->x.a==args[3].a,args2) != nothing
+		fargs = DPHT.findargs(S;a=2)
+		@test length(fargs) == 1
     end
 end
 
