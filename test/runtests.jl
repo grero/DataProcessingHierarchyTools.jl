@@ -297,6 +297,14 @@ end
         h = hash(args)
         @test h == 0xb6f003559185097d
         rm(fname)
+		for _ss in ss
+			DPHT.save(_ss)
+		end
+		args2 = DPHT.findargs(S)
+		@test length(args2) == length(args)
+		@test findfirst(x->x.a==args[1].a,args2) != nothing
+		@test findfirst(x->x.a==args[2].a,args2) != nothing
+		@test findfirst(x->x.a==args[3].a,args2) != nothing
     end
 end
 
