@@ -159,7 +159,7 @@ function load(args::T) where T <: DPHDataArgs
 end
 
 """
-Returns `true` if the data described by `args` has already been 
+Returns `true` if the data described by `args` has already been
 computed
 """
 function computed(args::T) where T <: DPHDataArgs
@@ -213,6 +213,17 @@ function get_level_name(target_level::String, dir=pwd())
         i -= 1
     end
     pp
+end
+
+"""
+Get the name of all requested levels
+"""
+function get_level_name(target_levels::Vector{String}, dir=pwd())
+	ll = String[]
+	for tl in target_levels
+		push!(ll, get_level_name(tl, dir))
+	end
+	joinpath(ll...)
 end
 
 """
