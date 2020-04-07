@@ -555,4 +555,17 @@ function findargs(::Type{T}, cwd=pwd();kvs...) where T <: DPHData
 	end
 	args
 end
+
+function reset!(args::DPHDataArgs)
+    reset!(filename(args))
+end
+
+"""
+Unlocks the file pointed to be `fname` if it is under git annex control, so that it can be overwritten.
+"""
+function reset!(fname::String)
+    if git_annex != nothing
+        run(`$(git_annex()) unlock $fname`)
+    end
+end
 end # module

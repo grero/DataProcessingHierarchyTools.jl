@@ -322,11 +322,17 @@ end
                 run(`git init`)
                 run(`$(DPHT.git_annex()) init .`)
                 run(`$(DPHT.git_annex()) add .`)
+                ss2 = S([0.1], [0.0 1.0; 1.0 0.0], 0.03, s_args)
                 mkpath("../testdata2")
                 cd("../testdata2") do
                     run(`git init --bare `)
                 end
                 run(`git remote add origin ../testdata2`)
+                run(`$(DPHT.git_annex()) sync origin`)
+                run(`$(DPHT.git_annex()) copy -t origin .`)
+                @test_throws ErrorException DPHT.save(ss2)
+                DPHT.reset!(s_args)
+                DPHT.save(ss2)
                 run(`$(DPHT.git_annex()) sync origin`)
                 run(`$(DPHT.git_annex()) copy -t origin .`)
                 run(`$(DPHT.git_annex()) drop .`)
@@ -342,9 +348,10 @@ end
             end
         end
         #cleanup
-
+        chmod("testdata", 0o777, recursive=true)
         rm("testdata", recursive=true)
         if isdir("testdata2")
+            chmod("testdata2", 0o777, recursive=true)
             rm("testdata2", recursive=true)
         end
     end
