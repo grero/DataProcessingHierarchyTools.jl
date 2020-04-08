@@ -564,8 +564,10 @@ end
 Unlocks the file pointed to be `fname` if it is under git annex control, so that it can be overwritten.
 """
 function reset!(fname::String)
-    if git_annex != nothing
-        run(`$(git_annex()) unlock $fname`)
+    if islink(fname)
+        if git_annex != nothing
+            run(`$(git_annex()) unlock $fname`)
+        end
     end
 end
 end # module
