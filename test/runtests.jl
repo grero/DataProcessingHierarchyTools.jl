@@ -83,13 +83,11 @@ dirs =["20140903/session01", "20140903/session02"]
             thislevel = DPHT.level()
             @test thislevel == "session"
             #test getting all level directories belonging to a particular level
-            session_dirs = DPHT.get_level_dirs("session")
-            @test session_dirs[1] == "./../session01"
-            @test session_dirs[2] == "./../session02"
+            session_dirs = DPHT.get_level_dirs("session","..")
+            @test session_dirs[1] == "../session01"
         end
         dirsn = DPHT.get_level_dirs("session",dirs[1])
-        @test dirsn[1] == "20140903/session01/./../session01"
-        @test dirsn[2] == "20140903/session01/./../session02"
+        @test dirsn[1] == "20140903/session01/."
         dirsn = DPHT.get_level_dirs("session")
         @test dirsn[1] == dirs[1]
         @test dirsn[2] == dirs[2]
