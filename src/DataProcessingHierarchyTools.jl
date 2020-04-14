@@ -220,10 +220,12 @@ Get all directories corresponding to `target_level` under the current hierarchy
 """
 function get_level_dirs(target_level::String, dir=pwd())
     dirs = cd(dir) do
-        this_level = level(dir)
+        this_level = level()
         this_idx = findfirst(l->this_level==l, levels)
         target_idx = findfirst(l->target_level==l, levels)
-        if target_idx <= this_idx
+        if target_idx == this_idx
+            dirs = ["."]
+        elseif target_idx < this_idx
             rel_path = process_level(target_level, dir)
             dirs = glob(joinpath(rel_path, "..", level_patterns_s[target_idx]))
         else
