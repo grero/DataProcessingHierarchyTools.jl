@@ -10,6 +10,11 @@ include("types.jl")
 
 const def = LaTeX_Entities.default
 
+"""
+    get_annex()
+
+Return the shell command that runs git annex on this computer, or `nothing` if the command is not found.
+"""
 function git_annex()
     cmd = nothing
     try
@@ -27,10 +32,17 @@ const level_patterns_s = ["*", "*", "[0-9]*", "session[0-9]*", "array[0-9]*", "c
 depends_on(::Type{T}) where T <: DPHData = DataType[]
 
 """
-Returns a list of files on which `args` depends.
+    dependencies(args::T) where T <: DPHDataArgs
+
+Return a list of files on which `args` depends.
 """
 dependencies(args::T) where T <: DPHDataArgs = String[]
 
+"""
+    check_args(X1::T, X2::T) where T <: DPHDataArgs
+
+Return `true` if the arguments in `X1` and `X2` are the same.
+"""
 function check_args(X1::T, X2::T) where T <: DPHDataArgs
     matches = true
     for f in fieldnames(T)
@@ -100,6 +112,17 @@ shortnames = Dict("subjects" => x->"",
                   "channel" => x->"g$(get_numbers(x))",
                   "cell" => x->"c$(get_numbers(x))")
 
+"""
+    get_shortname(ss::String)
+
+Get the short representation of the path `ss`.
+
+# Examples
+```jldoctest
+julia> DataProcessingHierarchyTools.get_shortname("Whiskey/20202001/session01/array01/channel034/cell01")
+"W20202001s01a01g034c01"
+```
+"""
 function get_shortname(ss::String)
     this_level = level(ss)
     this_idx = findfirst(l->this_level==l, levels)
@@ -114,7 +137,15 @@ function get_shortname(ss::String)
 end
 
 """
-Returns the full name of the current level
+    get_fullname(ss=pwd())
+
+Return the full name of the level pointed to by `ss`.
+
+# Examples
+```jldoctest
+julia> DataProcessingHierarchyTools.get_fullname("Whiskey/20202001/session01/array01/channel034/cell01")
+"Whiskey/20202001/session01/array01/channel034/cell01"
+```
 """
 function get_fullname(ss=pwd())
     this_level = level(ss)
@@ -159,8 +190,10 @@ function load(args::T) where T <: DPHDataArgs
 end
 
 """
-Returns `true` if the data described by `args` has already been 
-computed
+    computed(args::T) where T <: DPHDataArgs
+
+Return `true` if the data described by `args` has already been 
+computed.
 """
 function computed(args::T) where T <: DPHDataArgs
     fname = filename(args)
@@ -182,7 +215,15 @@ end
 export DPHData, level, filename, plot_data, datatype, BootstrappedDataArgs
 
 """
+    level(cwd::String)
+    
 Get the level of the directory represented by `cwd`.
+
+# Examples
+```jldoctest
+julia> DataProcessingHierarchyTools.level("Whiskey/session01/array01/channel034")
+"channel"
+```
 """
 function level(cwd::String)
     numbers = map(x->first(string(x)), 0:9)
@@ -199,7 +240,15 @@ function level(cwd::String)
 end
 
 """
-Get the name of the requested level
+    get_level_name(target_level::String, dir=pwd())
+
+Get the name of the requested level.
+
+# Examples
+```jldoctest
+julia> DataProcessingHierarchyTools.get_level_name("array", "Whiskey/20200110/session01/array01/channel034")
+"array01"
+```
 """
 function get_level_name(target_level::String, dir=pwd())
     this_level = level(dir)
@@ -216,7 +265,9 @@ function get_level_name(target_level::String, dir=pwd())
 end
 
 """
-Get all directories corresponding to `target_level` under the current hierarchy
+    get_level_dirs(target_level::String, dir=pwd())
+
+Get all directories corresponding to `target_level` under the current hierarchy.
 """
 function get_level_dirs(target_level::String, dir=pwd())
     dirs = cd(dir) do
@@ -239,6 +290,8 @@ function get_level_dirs(target_level::String, dir=pwd())
 end
 
 """
+    get_level_dirs(level::String, dirs::Vector{String})
+
 Get all unique level directories contained in `dirs`.
 """
 function get_level_dirs(level::String, dirs::Vector{String})
@@ -258,6 +311,8 @@ function get_level_dirs(level::String, dirs::Vector{String})
 end
 
 """
+    process_level(::Type{T}, dir=pwd();kvs...) where T <: DPHData
+
 Returns the relative path to an object of type `T`, using `dir` as the starting point.
 """
 function process_level(::Type{T}, dir=pwd();kvs...) where T <: DPHData
@@ -266,7 +321,15 @@ function process_level(::Type{T}, dir=pwd();kvs...) where T <: DPHData
 end
 
 """
+    process_level(target_level::String, dir=pwd();kvs...)
+
 Returns the path relative to `dir` of the level `target_level`.
+
+# Examples
+```jldoctest
+julia> DataProcessingHierarchyTools.process_level("session", "Whiskey/session01/array02/channel034")
+"./../.."
+```
 """
 function process_level(target_level::String, dir=pwd();kvs...)
     # get the current level
@@ -284,8 +347,9 @@ function process_level(target_level::String, dir=pwd();kvs...)
 end
 
 """
-Returns the path of the current directory relative to `level_dir`
+    get_relative_path(level_dir::String,dir=pwd())
 
+Return the path of the current directory relative to `level_dir`.
 """
 function get_relative_path(level_dir::String,dir=pwd())
     this_level = level(dir)
@@ -305,6 +369,8 @@ function get_relative_path(level_dir::String,dir=pwd())
 end
 
 """
+    process_dirs(::Type{T}, dirs::Vector{String}, args...;kvs...) where T <: DPHData
+
 Process each directory in `dirs`, creating an object of type `T`, and returning a concatenation of those objects.
 """
 function process_dirs(::Type{T}, dirs::Vector{String}, args...;kvs...) where T <: DPHData
@@ -321,6 +387,8 @@ function process_dirs(::Type{T}, dirs::Vector{String}, args...;kvs...) where T <
 end
 
 """
+    visit_dirs(::Type{T}, dirs::Vector{String}, args...;kvs...) where T <: DPHData
+
 Visit each directory in `dirs`, instantiating type `T` with argumments `args` and keyword arguments `kvs`. Note that this function is similar to `process_dirs`, except unlike that function, `visit_dirs` does not return any results.
 """
 function visit_dirs(::Type{T}, dirs::Vector{String}, args...;kvs...) where T <: DPHData
@@ -352,6 +420,8 @@ function visit_dirs(func::Function, dirs::Vector{String}, args...;kvs...)
 end
 
 """
+    process_dirs(func::Function, dirs::Vector{String}, args...;kvs...)
+
 Process each directory in `dirs` by running the function `func`.
 """
 function process_dirs(func::Function, dirs::Vector{String}, args...;kvs...)
@@ -365,6 +435,8 @@ function process_dirs(func::Function, dirs::Vector{String}, args...;kvs...)
 end
 
 """
+    load(::Type{T}, args...;kvs...) where T <: DPHData
+
 Load an object of type `T` from the current directory, using additional constructor arguments `args`.
 """
 function load(::Type{T}, args...;kvs...) where T <: DPHData
@@ -381,7 +453,15 @@ function load(::Type{T}, args...;kvs...) where T <: DPHData
 end
 
 """
-Convert some unicde symbols to their latex equivalent before saving
+    sanitise(ss::String)
+
+Convert some unicde symbols to their latex equivalent before saving.
+
+# Examples
+```jldoctest
+julia> DataProcessingHierarchyTools.sanitise("σ")
+"sigma"
+```
 """
 function sanitise(ss::String)
     oo = String[]
@@ -397,6 +477,17 @@ function sanitise(ss::String)
     join(oo, "")
 end
 
+"""
+    desanitise(ss::String)
+
+Convert from certain unicode names to latex symbols.
+
+# Examples
+```jldoctest
+julia> DataProcessingHierarchyTools.desanitise("sigma")
+"σ"
+```
+"""
 function desanitise(ss::String)
     oo = String[]
     ss_split = split(ss, "_")
@@ -412,6 +503,11 @@ function desanitise(ss::String)
     join(oo, "_")
 end
 
+"""
+    save(X::T, fname=filename(X.args)) where T <: DPHData
+
+Save `X` to a Matlab compatible file.
+"""
 function save(X::T, fname=filename(X.args)) where T <: DPHData
     Q = convert(Dict{String,Any}, X)
     MAT.matwrite(fname,Q)
@@ -445,6 +541,11 @@ function Base.convert(::Type{Dict{String,Any}}, X::T) where T <: Union{DPHData, 
     Q
 end
 
+"""
+    load(::Type{T}, fname=filename(T)) where T <: DPHData
+
+Load a variable of type `T` from the file pointed to by `fname`.
+"""
 function load(::Type{T}, fname=filename(T)) where T <: DPHData
     if islink(fname) && git_annex != nothing
         run(`$(git_annex()) get $fname`)
@@ -491,6 +592,8 @@ function Base.convert(::Type{T}, Q::Dict{String, Any}) where T <: Union{DPHData,
 end
 
 """
+    Base.filter(func::Function, typeargs::T2, dirs::Vector{String}, args...;verbose=0)  where T2 <: DPHDataArgs
+
 Return those directories among `dirs` where `func`,using arguments `args`,  returns true for an object whose arguments are compatible with  `typeargs`.
 """
 function Base.filter(func::Function, typeargs::T2, dirs::Vector{String}, args...;verbose=0)  where T2 <: DPHDataArgs
@@ -532,6 +635,11 @@ function Base.show(io::IO, X::T) where T <: DPHDataArgs
     end
 end
 
+"""
+    findargs(::Type{T}, cwd=pwd();kvs...) where T <: DPHData
+
+Return a list of arguments for which data exists for the type `T`.
+"""
 function findargs(::Type{T}, cwd=pwd();kvs...) where T <: DPHData
 	fname = filename(T)
 	fname = replace(fname, ".mat" => "*.mat")
@@ -563,7 +671,9 @@ function reset!(args::DPHDataArgs)
 end
 
 """
-Unlocks the file pointed to be `fname` if it is under git annex control, so that it can be overwritten.
+    reset!(fname::String)
+
+Unlock the file pointed to be `fname` if it is under git annex control, so that it can be overwritten.
 """
 function reset!(fname::String)
     if islink(fname)
