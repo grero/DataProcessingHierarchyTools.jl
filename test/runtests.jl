@@ -329,6 +329,7 @@ end
                 run(`$(DPHT.git_annex()) sync origin`)
                 run(`$(DPHT.git_annex()) copy -t origin .`)
                 @test_throws ErrorException DPHT.save(ss2)
+                run(`$(DPHT.git_annex()) drop .`)
                 DPHT.reset!(s_args)
                 DPHT.save(ss2)
                 run(`$(DPHT.git_annex()) sync origin`)
