@@ -25,15 +25,14 @@ addons:
     - git-annex
 
 before_script: # homebrew for mac
-  - if [ $TRAVIS_OS_NAME = osx ]; then  rm /usr/local/include/c++; brew install gcc; fi
+  - if [ $TRAVIS_OS_NAME = osx ]; then  rm /usr/local/include/c++; brew upgrade gcc; fi
   - if [ $TRAVIS_OS_NAME = osx ]; then brew link --overwrite gcc; fi
   - if [ $TRAVIS_OS_NAME = osx ]; then brew install hdf5; fi
 
 ## uncomment the following lines to override the default test script
 #script:
-#  - julia -e 'Pkg.clone(pwd()); Pkg.add("MAT"); Pkg.build("DataProcessingHierarchyTools"); Pkg.test("DataProcessingHierarchyTools"; coverage=true)'
 after_success:
   # push coverage results to Coveralls
-  - julia -e 'cd(Pkg.dir("DataProcessingHierarchyTools")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
+  - julia -e 'using Pkg; import DataProcessingHierarchyTools; cd(joinpath(dirname(pathof(DataProcessingHierarchyTools)),"..")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
   # push coverage results to Codecov
-  - julia -e 'cd(Pkg.dir("DataProcessingHierarchyTools")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
+  - julia -e 'using Pkg; import DataProcessingHierarchyTools; cd(joinpath(dirname(pathof(DataProcessingHierarchyTools)),"..")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
