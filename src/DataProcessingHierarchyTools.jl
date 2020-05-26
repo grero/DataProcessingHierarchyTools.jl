@@ -568,6 +568,7 @@ Unlocks the file pointed to be `fname` if it is under git annex control, so that
 function reset!(fname::String)
     if islink(fname)
         if git_annex != nothing
+            run(`$(git_annex()) get $fname`)
             run(`$(git_annex()) unlock $fname`)
         end
     end
