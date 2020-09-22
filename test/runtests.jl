@@ -1,7 +1,7 @@
 module DPHTTest
 using DataProcessingHierarchyTools
 const DPHT = DataProcessingHierarchyTools
-import DataProcessingHierarchyTools:level, filename
+import DataProcessingHierarchyTools:level, filename, shash
 using Test
 using LinearAlgebra
 
@@ -172,7 +172,7 @@ end
 
 @testset "ArgsHash" begin
     args = MyArgs(1.0, 3, -1.0:0.5:10.0)
-    h = hash(args)
+    h = shash(args)
     @test h == 0x34c727e2f750c253
     @test DPHT.filename(args) == "mydata_34c727e2f750c253.mat"
 end
@@ -292,7 +292,7 @@ end
         @test ss2[3].μ == ss[3].μ
         @test ss2[3].Σ == ss[3].Σ
         fname = DPHT.filename(args)
-        h = hash(args)
+        h = shash(args)
         @test h == 0xb6f003559185097d
         rm(fname)
 		for _ss in ss
