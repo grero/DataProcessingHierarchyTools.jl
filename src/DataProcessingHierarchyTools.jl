@@ -4,7 +4,9 @@ using ProgressMeter
 using Glob
 using MAT
 using StrTables, LaTeX_Entities
-import Base:hash,filter,show, convert
+using StableHashes
+import StableHashes.shash
+import Base:filter,show, convert
 
 include("types.jl")
 
@@ -137,7 +139,7 @@ version(X::DPHDataArgs) = "UNKNOWN"
 
 function filename(args::T) where T <: DPHDataArgs
     fname = filename(datatype(T))
-    h = string(hash(args),base=16)
+    h = string(shash(args),base=16)
     bn, ext = splitext(fname)
     fname = join([bn, "_", h, ext])
     fname
@@ -145,7 +147,7 @@ end
 
 function filename(args::Vector{T}) where T <: DPHDataArgs
     fname = filename(datatype(T))
-    h = string(hash(args),base=16)
+    h = string(shash(args),base=16)
     bn, ext = splitext(fname)
     fname = join([bn, "_", h, ext])
     fname
