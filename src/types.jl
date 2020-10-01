@@ -25,6 +25,21 @@ function shash(args::T, h::UInt64) where T <: DPHDataArgs
     h
 end
 
+_hash(x) =_hash(x, zero(UInt64))
+function _hash(args::T, h::UInt64) where T <: DPHDataArgs
+    for f in fieldnames(T)
+        x = getfield(args, f)
+        if typeof(x) <: AbstractVector
+            for _x in x
+                h = hash(_x, h)
+            end
+        elseif !((f == :version) && (x == "UNKNOWN"))
+            h = hash(x, h)
+        end
+    end
+    h
+end
+
 function shash(args::Vector{T}, h::UInt64) where T <: DPHDataArgs
     for _args in args
         h = shash(_args, h)
