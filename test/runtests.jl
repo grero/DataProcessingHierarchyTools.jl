@@ -1,7 +1,7 @@
 module DPHTTest
 using DataProcessingHierarchyTools
 const DPHT = DataProcessingHierarchyTools
-import DataProcessingHierarchyTools:level, filename, shash
+import DataProcessingHierarchyTools:level, filename, shash, _hash
 using Test
 using LinearAlgebra
 
@@ -175,6 +175,12 @@ end
     h = shash(args)
     @test h == 0x34c727e2f750c253
     @test DPHT.filename(args) == "mydata_34c727e2f750c253.mat"
+	h2 = _hash(args)
+	if Base.VERSION < v"1.5.0"
+		@test h2 == h
+	elseif Base.VERSION < v"1.6.0"
+		@test h2 == 0x34c727e2f750c253
+	end
 end
 
 @testset "ArgsCheck" begin
