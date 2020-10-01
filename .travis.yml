@@ -28,6 +28,10 @@ before_script: # homebrew for mac
   - if [ $TRAVIS_OS_NAME = osx ]; then  rm /usr/local/include/c++; brew upgrade gcc; fi
   - if [ $TRAVIS_OS_NAME = osx ]; then brew link --overwrite gcc; fi
   - if [ $TRAVIS_OS_NAME = osx ]; then brew install hdf5; fi
+  - echo "$DEPLOY_KEY" | tr -d '\r' | ssh-add - > /dev/null
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  - julia -e "using Pkg; Pkg.update();pkg\"registry add git@gitlab.com:grero/NeuralCodingRegistry.jl.git\"; pkg\"registry status\""
 
 ## uncomment the following lines to override the default test script
 #script:
