@@ -25,6 +25,7 @@ function shash(args::T, h::UInt64) where T <: DPHDataArgs
     h
 end
 
+_hash(x) =_hash(x, zero(UInt64))
 function _hash(args::T, h::UInt64) where T <: DPHDataArgs
     for f in fieldnames(T)
         x = getfield(args, f)
