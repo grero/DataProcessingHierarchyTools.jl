@@ -28,6 +28,7 @@ before_script: # homebrew for mac
   - if [ $TRAVIS_OS_NAME = osx ]; then  rm /usr/local/include/c++; brew upgrade gcc; fi
   - if [ $TRAVIS_OS_NAME = osx ]; then brew link --overwrite gcc; fi
   - if [ $TRAVIS_OS_NAME = osx ]; then brew install hdf5; fi
+  - eval $(ssh-agent -s)
   - echo "$DEPLOY_KEY" | tr -d '\r' | ssh-add - > /dev/null
   - mkdir -p ~/.ssh
   - chmod 700 ~/.ssh
