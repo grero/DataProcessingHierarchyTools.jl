@@ -66,6 +66,10 @@ dirs =["20140903/session01", "20140903/session02"]
     @test rpath == "."
     @test_throws ErrorException DPHT.get_relative_path("channel", "newWorkingMemory/Pancake/20130923")
 
+    thislevel = "newWorkingMemory/Pancake/20130923/session01/array01/channel001/cell01"
+    @test DPHT.get_level_path("array", thislevel) == "newWorkingMemory/Pancake/20130923/session01/array01"
+    @test DPHT.get_level_path("session", thislevel) == "newWorkingMemory/Pancake/20130923/session01"
+
     dd = tempdir()
     cd(dd) do
         for d2 in dirs
