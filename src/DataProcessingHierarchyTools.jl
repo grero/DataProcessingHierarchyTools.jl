@@ -201,6 +201,22 @@ function level(cwd::String)
 end
 
 """
+Get the path of `dir` up `target_level`
+"""
+function get_level_path(target_level::String, dir=pwd())
+    parts = splitpath(dir)
+    new_parts = String[]
+    target_idx = findfirst(levels .== target_level)
+    for p in parts
+        this_idx = findfirst(levels .== level(p))
+        if this_idx <= target_idx
+            push!(new_parts, p)
+        end
+    end
+    return joinpath(new_parts...)
+end
+
+"""
 Get the name of the requested level
 """
 function get_level_name(target_level::String, dir=pwd())
