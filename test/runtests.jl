@@ -319,6 +319,12 @@ end
     s_args = SArgs(2)
     ss = S([0.1], [0.0 1.0; 1.0 0.0], 0.05, s_args)
     cd(tdir) do
+        for d in ["testdata","testdata2"]
+            if isdir(d)
+                chmod(d, 0o777, recursive=true)
+                rm(d, recursive=true)
+            end
+        end
         mkpath("testdata")
         cd("testdata") do
             DPHT.save(ss)
