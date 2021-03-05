@@ -345,12 +345,31 @@ end
             @test DPHT.computed(s_args)
             ss2 = DPHT.load(s_args)
             @test ss2.args.a == ss.args.a
+
+            q = DPHT.get_computed(()->(1,2), "testrun.jld2", "a","b")
+            @test q == (1,2)
+            @test isfile("testrun.jld2")
+            q2 = DPHT.FileIO.load("testrun.jld2", "a","b")
+            @test q2 == q
+            if DPHT.git_annex() != nothing
+                run(`$(DPHT.git_annex()) copy -t origin testrun.jld2`)
+                run(`$(DPHT.git_annex()) drop testrun.jld2`)
+            end
+            # make sure that we can still get the file, even if we dropped it
+            q3 = DPHT.get_computed(()->(1,2), "testrun.jld2", "a","b")
+            @test q3 == q2
+
+            #finally, check that the function returns a warning of compute == false
+            @test (@test_logs (:warn, "File testrun2.jld2 does not appear to exist, but `compute` is set to false. Run again with `compute = true` to compute the data") DPHT.get_computed(()->(1,2), "testrun2.jld2", "a","b";compute=false)) == nothing
+            @test isfile("testrun2.jld2") == false
+
             #cleanup
             if DPHT.git_annex() != nothing
                 fname = DPHT.filename(s_args)
                 run(`$(DPHT.git_annex()) drop --force --from origin $fname`)
                 run(`$(DPHT.git_annex()) drop --force $fname`)
             end
+
         end
         #cleanup
         chmod("testdata", 0o777, recursive=true)
