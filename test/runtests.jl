@@ -330,6 +330,7 @@ end
                 run(`git init`)
                 run(`$(DPHT.git_annex()) init .`)
                 run(`$(DPHT.git_annex()) add .`)
+                run(`$(DPHT.git_annex()) lock .`)
                 ss2 = S([0.1], [0.0 1.0; 1.0 0.0], 0.03, s_args)
                 mkpath("../testdata2")
                 cd("../testdata2") do
