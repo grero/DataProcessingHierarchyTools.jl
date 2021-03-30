@@ -338,6 +338,8 @@ end
                 run(`git remote add origin ../testdata2`)
                 run(`$(DPHT.git_annex()) sync origin`)
                 run(`$(DPHT.git_annex()) copy -t origin .`)
+                @test isfile(DPHT.filename(ss2.args))
+                touch(DPHT.filename(ss2.args))
                 @test_throws ErrorException DPHT.save(ss2)
                 run(`$(DPHT.git_annex()) drop .`)
                 DPHT.reset!(s_args)
