@@ -1,5 +1,8 @@
 image: julia:1.5
 
+before_script:  
+  - apt-get install git-annex
+
 default:
     script:
     - julia --project=@. -e "import Pkg; Pkg.test(; coverage = true)"
