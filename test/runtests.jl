@@ -329,7 +329,7 @@ end
             if DPHT.git_annex() != nothing
                 run(`git init`)
                 run(`$(DPHT.git_annex()) init .`)
-                run(`$(DPHT.git_annex()) add --force-large .`)
+                run(`$(DPHT.git_annex()) add .`)
                 ss2 = S([0.1], [0.0 1.0; 1.0 0.0], 0.03, s_args)
                 mkpath("../testdata2")
                 cd("../testdata2") do
