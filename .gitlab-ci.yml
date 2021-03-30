@@ -1,0 +1,25 @@
+image: julia:1.5
+
+default:
+    script:
+    - julia --project=@. -e "import Pkg; Pkg.test(; coverage = true)"
+    - julia --project=test/coverage -e 'import Pkg; Pkg.instantiate()'
+    - julia --project=test/coverage test/coverage/coverage-summary.jl
+    artifacts:
+        paths:
+            - coverage/
+
+    tags:
+        - docker
+pages:
+    stage: deploy
+    dependencies: 
+        - default
+    script:
+        - mv coverage/ public/
+    artifacts:
+        paths:
+            - public
+        expire_in: 30 days
+    only:
+        - master
