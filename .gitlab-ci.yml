@@ -1,7 +1,8 @@
 image: julia:1.5
 
 before_script:  
-  - apt-get install git-annex
+  - apt-get -qq update
+  - apt-get install -qq git-annex
 
 default:
     script:
