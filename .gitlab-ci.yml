@@ -5,6 +5,7 @@ before_script:
   - apt-get install -qq git-annex
   - git config --global user.email "gitlabci@gitlab.com"
   - git config --global user.name "GitlabCI"
+  - git annex version
 
 default:
     script:
