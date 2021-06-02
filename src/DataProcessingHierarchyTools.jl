@@ -430,7 +430,10 @@ function desanitise(ss::String)
     join(oo, "_")
 end
 
-function save(X::T, fname=filename(X.args)) where T <: DPHData
+function save(X::T, fname=filename(X.args);overwrite=false) where T <: DPHData
+    if isfile(fname) && !overwrite
+        error("File $fname already exists")
+    end
     Q = convert(Dict{String,Any}, X)
     MAT.matwrite(fname,Q)
 end
