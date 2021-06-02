@@ -306,7 +306,7 @@ end
         @test h == 0xb6f003559185097d
         rm(fname)
 		for _ss in ss
-			DPHT.save(_ss)
+			DPHT.save(_ss, overwrite=true)
 		end
 		args2 = DPHT.findargs(S)
 		@test length(args2) == length(args)
@@ -325,7 +325,7 @@ end
     cd(tdir) do
         mkpath("testdata")
         cd("testdata") do
-            DPHT.save(ss)
+            DPHT.save(ss, overwrite=true)
             if DPHT.git_annex() != nothing
                 run(`git init`)
                 run(`$(DPHT.git_annex()) init .`)
@@ -343,7 +343,7 @@ end
                 @test_throws ErrorException DPHT.save(ss2)
                 run(`$(DPHT.git_annex()) drop .`)
                 DPHT.reset!(s_args)
-                DPHT.save(ss2)
+                DPHT.save(ss2, overwrite=true)
                 run(`$(DPHT.git_annex()) sync origin`)
                 run(`$(DPHT.git_annex()) copy -t origin .`)
                 run(`$(DPHT.git_annex()) drop .`)
