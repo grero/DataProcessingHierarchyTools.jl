@@ -66,6 +66,10 @@ dirs =["20140903/session01", "20140903/session02"]
     @test rpath == "."
     @test_throws ErrorException DPHT.get_relative_path("channel", "newWorkingMemory/Pancake/20130923")
 
+    thislevel = "newWorkingMemory/Pancake/20130923/session01/array01/channel001/cell01"
+    @test DPHT.get_level_path("array", thislevel) == "newWorkingMemory/Pancake/20130923/session01/array01"
+    @test DPHT.get_level_path("session", thislevel) == "newWorkingMemory/Pancake/20130923/session01"
+
     dd = tempdir()
     cd(dd) do
         for d2 in dirs
@@ -302,7 +306,7 @@ end
         @test h == 0xb6f003559185097d
         rm(fname)
 		for _ss in ss
-			DPHT.save(_ss)
+			DPHT.save(_ss, overwrite=true)
 		end
 		args2 = DPHT.findargs(S)
 		@test length(args2) == length(args)
@@ -321,11 +325,12 @@ end
     cd(tdir) do
         mkpath("testdata")
         cd("testdata") do
-            DPHT.save(ss)
+            DPHT.save(ss, overwrite=true)
             if DPHT.git_annex() != nothing
                 run(`git init`)
                 run(`$(DPHT.git_annex()) init .`)
                 run(`$(DPHT.git_annex()) add .`)
+                run(`$(DPHT.git_annex()) lock`)
                 ss2 = S([0.1], [0.0 1.0; 1.0 0.0], 0.03, s_args)
                 mkpath("../testdata2")
                 cd("../testdata2") do
@@ -334,10 +339,11 @@ end
                 run(`git remote add origin ../testdata2`)
                 run(`$(DPHT.git_annex()) sync origin`)
                 run(`$(DPHT.git_annex()) copy -t origin .`)
+                @test isfile(DPHT.filename(ss2.args))
                 @test_throws ErrorException DPHT.save(ss2)
                 run(`$(DPHT.git_annex()) drop .`)
                 DPHT.reset!(s_args)
-                DPHT.save(ss2)
+                DPHT.save(ss2, overwrite=true)
                 run(`$(DPHT.git_annex()) sync origin`)
                 run(`$(DPHT.git_annex()) copy -t origin .`)
                 run(`$(DPHT.git_annex()) drop .`)

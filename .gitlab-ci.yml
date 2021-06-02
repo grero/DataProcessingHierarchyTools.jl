@@ -1,0 +1,33 @@
+image: julia:1.5
+
+before_script:  
+  - apt-get -qq update
+  - apt-get install -qq lcov
+  - apt-get install -qq git-annex
+  - git config --global user.email "gitlabci@gitlab.com"
+  - git config --global user.name "GitlabCI"
+  - git annex version
+
+default:
+    script:
+    - julia --project=@. -e "import Pkg; Pkg.test(; coverage = true)"
+    - julia --project=test/coverage -e 'import Pkg; Pkg.instantiate()'
+    - julia --project=test/coverage test/coverage/coverage-summary.jl
+    artifacts:
+        paths:
+            - coverage/
+
+    tags:
+        - docker
+pages:
+    stage: deploy
+    dependencies: 
+        - default
+    script:
+        - mv coverage/ public/
+    artifacts:
+        paths:
+            - public
+        expire_in: 30 days
+    only:
+        - master

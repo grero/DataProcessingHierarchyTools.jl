@@ -201,6 +201,22 @@ function level(cwd::String)
 end
 
 """
+Get the path of `dir` up `target_level`
+"""
+function get_level_path(target_level::String, dir=pwd())
+    parts = splitpath(dir)
+    new_parts = String[]
+    target_idx = findfirst(levels .== target_level)
+    for p in parts
+        this_idx = findfirst(levels .== level(p))
+        if this_idx <= target_idx
+            push!(new_parts, p)
+        end
+    end
+    return joinpath(new_parts...)
+end
+
+"""
 Get the name of the requested level
 """
 function get_level_name(target_level::String, dir=pwd())
@@ -414,7 +430,10 @@ function desanitise(ss::String)
     join(oo, "_")
 end
 
-function save(X::T, fname=filename(X.args)) where T <: DPHData
+function save(X::T, fname=filename(X.args);overwrite=false) where T <: DPHData
+    if isfile(fname) && !overwrite
+        error("File $fname already exists")
+    end
     Q = convert(Dict{String,Any}, X)
     MAT.matwrite(fname,Q)
 end
@@ -448,8 +467,16 @@ function Base.convert(::Type{Dict{String,Any}}, X::T) where T <: Union{DPHData, 
 end
 
 function load(::Type{T}, fname=filename(T)) where T <: DPHData
-    if islink(fname) && git_annex != nothing
-        run(`$(git_annex()) get $fname`)
+    if git_annex() != nothing
+        is_annex = false
+        try
+            run(pipeline(`$(git_annex()) status`, stdout=devnull, stderr=devnull))
+            is_annex = true
+        catch
+        end
+        if is_annex
+            run(`$(git_annex()) get $fname`)
+        end
     end
     if isfile(fname)
         Q = MAT.matread(fname)
