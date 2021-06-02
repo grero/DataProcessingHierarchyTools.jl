@@ -2,6 +2,7 @@ image: julia:1.5
 
 before_script:  
   - apt-get -qq update
+  - apt-get instal -qq lcov
   - apt-get install -qq git-annex
   - git config --global user.email "gitlabci@gitlab.com"
   - git config --global user.name "GitlabCI"
