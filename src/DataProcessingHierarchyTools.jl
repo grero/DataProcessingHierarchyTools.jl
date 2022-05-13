@@ -467,17 +467,24 @@ function Base.convert(::Type{Dict{String,Any}}, X::T) where T <: Union{DPHData, 
 end
 
 function load(::Type{T}, fname=filename(T)) where T <: DPHData
-    if git_annex() != nothing
-        is_annex = false
-        try
-            run(pipeline(`$(git_annex()) status`, stdout=devnull, stderr=devnull))
-            is_annex = true
-        catch
-        end
-        if is_annex
-            run(`$(git_annex()) get $fname`)
-        end
-    end
+	if !(isfile(fname) || islink(fname))
+		error("File $fname does not exist")
+	end
+	if islink(fname)
+		if !isfile(readlink(fname))
+			if git_annex() != nothing
+				is_annex = false
+				try
+					run(pipeline(`$(git_annex()) status`, stdout=devnull, stderr=devnull))
+					is_annex = true
+				catch
+				end
+				if is_annex
+					run(`$(git_annex()) get $fname`)
+				end
+			end
+		end
+	end
     if isfile(fname)
         Q = MAT.matread(fname)
     else
