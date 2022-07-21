@@ -21,6 +21,20 @@ function git_annex()
     return cmd
 end
 
+"""
+Hack to check whether a file is annexed without having to call
+git-annex
+"""
+function is_annexed(fname)
+	if islink(fname)
+		tt = readlink(fname)
+		return contains(".git/objects", tt)
+	else
+		hh = "/annex/objects/"
+		bytes = read(fname, length(hh))
+	end
+end
+
 const levels = ["subjects", "subject", "day", "session", "array", "channel", "cell"]
 const level_patterns = [r"[0-9A-Za-z]*", r"[0-9]{8}", r"session[0-9]{2}", r"array[0-9]{2}", r"channel[0-9]{3}", r"cell[0-9]{2}"]
 const level_patterns_s = ["*", "*", "[0-9]*", "session[0-9]*", "array[0-9]*", "channel[0-9]*", "cell[0-9]*"]
