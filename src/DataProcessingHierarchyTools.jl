@@ -175,7 +175,7 @@ function load(args::T) where T <: DPHDataArgs
 end
 
 """
-Returns `true` if the data described by `args` has already been 
+Returns `true` if the data described by `args` has already been
 computed
 """
 function computed(args::T) where T <: DPHDataArgs
