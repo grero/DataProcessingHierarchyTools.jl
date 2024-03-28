@@ -21,6 +21,20 @@ function git_annex()
     return cmd
 end
 
+"""
+Hack to check whether a file is annexed without having to call
+git-annex
+"""
+function is_annexed(fname)
+	if islink(fname)
+		tt = readlink(fname)
+		return contains(".git/objects", tt)
+	else
+		hh = "/annex/objects/"
+		bytes = read(fname, length(hh))
+	end
+end
+
 const levels = ["subjects", "subject", "day", "session", "array", "channel", "cell"]
 const level_patterns = [r"[0-9A-Za-z]*", r"[0-9]{8}", r"session[0-9]{2}", r"array[0-9]{2}", r"channel[0-9]{3}", r"cell[0-9]{2}"]
 const level_patterns_s = ["*", "*", "[0-9]*", "session[0-9]*", "array[0-9]*", "channel[0-9]*", "cell[0-9]*"]
@@ -161,7 +175,7 @@ function load(args::T) where T <: DPHDataArgs
 end
 
 """
-Returns `true` if the data described by `args` has already been 
+Returns `true` if the data described by `args` has already been
 computed
 """
 function computed(args::T) where T <: DPHDataArgs
@@ -467,17 +481,24 @@ function Base.convert(::Type{Dict{String,Any}}, X::T) where T <: Union{DPHData, 
 end
 
 function load(::Type{T}, fname=filename(T)) where T <: DPHData
-    if git_annex() != nothing
-        is_annex = false
-        try
-            run(pipeline(`$(git_annex()) status`, stdout=devnull, stderr=devnull))
-            is_annex = true
-        catch
-        end
-        if is_annex
-            run(`$(git_annex()) get $fname`)
-        end
-    end
+	if !(isfile(fname) || islink(fname))
+		error("File $fname does not exist")
+	end
+	if islink(fname)
+		if !isfile(readlink(fname))
+			if git_annex() != nothing
+				is_annex = false
+				try
+					run(pipeline(`$(git_annex()) status`, stdout=devnull, stderr=devnull))
+					is_annex = true
+				catch
+				end
+				if is_annex
+					run(`$(git_annex()) get $fname`)
+				end
+			end
+		end
+	end
     if isfile(fname)
         Q = MAT.matread(fname)
     else
