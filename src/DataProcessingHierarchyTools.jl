@@ -248,6 +248,17 @@ function get_level_name(target_level::String, dir=pwd())
 end
 
 """
+Get the name of all requested levels
+"""
+function get_level_name(target_levels::Vector{String}, dir=pwd())
+	ll = String[]
+	for tl in target_levels
+		push!(ll, get_level_name(tl, dir))
+	end
+	joinpath(ll...)
+end
+
+"""
 Get all directories corresponding to `target_level` under the current hierarchy
 """
 function get_level_dirs(target_level::String, dir=pwd())
