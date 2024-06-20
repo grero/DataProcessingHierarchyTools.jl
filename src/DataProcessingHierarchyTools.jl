@@ -2,6 +2,8 @@ __precompile__()
 module DataProcessingHierarchyTools
 using ProgressMeter
 using Glob
+using FileIO
+using JLD2
 using MAT
 using StrTables, LaTeX_Entities
 using StableHashes
@@ -622,5 +624,33 @@ function reset!(fname::String)
             run(`$(git_annex()) unlock $fname`)
         end
     end
+end
+
+"""
+Load `varsnames...` from `fname` if the file exists, if not recompute using `func`, saving to `fname` using `varnames` as the variable names.
+"""
+function get_computed(func::Function, fname::String, varnames::String...;commit_msg="Added $fname", compute=true)
+    _cmd = git_annex()
+    if islink(fname) && !isfile(fname)  # git annex file
+        if _cmd != nothing
+            run(`$(_cmd) get $fname`)
+        end
+    end
+	if isfile(fname)
+		q = FileIO.load(fname, varnames...)
+	else
+        if compute
+            q = func()
+            FileIO.save(fname, Dict(k=>v for (k,v) in zip(varnames, q)))
+            if _cmd != nothing
+                run(`$(_cmd) add $fname`)
+                run(` git commit -m $commit_msg`)
+            end
+        else
+            @warn "File $fname does not appear to exist, but `compute` is set to false. Run again with `compute = true` to compute the data"
+            return nothing
+        end
+	end
+	q
 end
 end # module
