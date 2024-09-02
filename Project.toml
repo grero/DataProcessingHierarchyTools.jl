@@ -1,7 +1,7 @@
 name = "DataProcessingHierarchyTools"
 uuid = "c4d60adb-60c8-55d6-9a12-9d581dce3acf"
 author = "Roger Herikstad <roger.herikstad@gmail.com>"
-version = "0.15.0"
+version = "0.16.0"
 
 [deps]
 Glob = "c27321d9-0574-5035-807b-f59d2c89b15c"

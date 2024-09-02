@@ -146,6 +146,7 @@ end
 
 level() = level(pwd())
 level(::Type{DPHData}) = error("Not implemented")
+level(x::T) where T  = level(T)
 filename(::Type{DPHData}) = error("Not implemented")
 datatype(::Type{DPHDataArgs}) = error("Not implemented")
 datatype(X::T) where T <: DPHDataArgs = datatype(T)
@@ -292,7 +293,7 @@ end
 """
 Returns the relative path to an object of type `T`, using `dir` as the starting point.
 """
-function process_level(::Type{T}, dir=pwd();kvs...) where T <: DPHData
+function process_level(::Type{T}, dir=pwd();kvs...) where T <: Any
     target_level = level(T)
     process_level(target_level, dir;kvs...)
 end
