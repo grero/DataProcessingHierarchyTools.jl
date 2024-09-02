@@ -293,7 +293,7 @@ end
 """
 Returns the relative path to an object of type `T`, using `dir` as the starting point.
 """
-function process_level(::Type{T}, dir=pwd();kvs...) where T <: DPHData
+function process_level(::Type{T}, dir=pwd();kvs...) where T <: Any
     target_level = level(T)
     process_level(target_level, dir;kvs...)
 end
